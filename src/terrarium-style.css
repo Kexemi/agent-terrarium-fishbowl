@@ -17,6 +17,7 @@
   --calm: #4f9b68;
   --watch: #c9843e;
   --blocked: #b94e62;
+  --app-viewport-height: 100dvh;
   font-family: "Segoe UI", ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -42,6 +43,8 @@ body {
 body {
   position: fixed;
   inset: 0;
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
   background:
     radial-gradient(circle at 50% -10%, #9ac9b7 0, #456f62 44%, #243d38 100%);
 }
@@ -58,9 +61,9 @@ p {
 }
 
 .shell {
-  width: 100vw;
-  height: 100svh;
-  max-height: 100dvh;
+  width: 100%;
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
   display: grid;
   grid-template-rows: 54px minmax(0, 1fr);
   gap: 6px;
@@ -472,6 +475,100 @@ h1 {
   50% { transform: translateX(7px); opacity: 1; }
 }
 
+.proximity-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+
+.proximity-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(156px, calc(100% - 16px));
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+  overflow: hidden;
+  border: 2px solid #3f2b29;
+  border-radius: 9px;
+  padding: 5px 7px 5px 6px;
+  background: #fff1c7ed;
+  color: var(--ink-brown);
+  box-shadow: 2px 3px 0 #241c1a88;
+  pointer-events: none;
+  transform: translate3d(-200vw, -200vh, 0);
+  will-change: transform;
+}
+
+.proximity-card[data-primary="false"] {
+  width: min(136px, calc(100% - 16px));
+  min-height: 30px;
+  padding-block: 4px;
+  opacity: 0.88;
+}
+
+.proximity-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+  border: 1px solid #3f2b29;
+  border-radius: 2px;
+  background: var(--calm);
+  box-shadow: 1px 1px 0 #3f2b2966;
+}
+
+.proximity-card[data-tone="active"] .proximity-dot,
+.proximity-card[data-tone="ready"] .proximity-dot { background: var(--gold); }
+.proximity-card[data-tone="warning"] .proximity-dot { background: var(--watch); }
+.proximity-card[data-tone="blocked"] .proximity-dot { background: var(--blocked); }
+.proximity-card[data-tone="quiet"] .proximity-dot { background: #8b8777; }
+.proximity-card[data-tone="focus"] .proximity-dot { background: var(--water-clear); }
+
+.proximity-copy {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.proximity-title,
+.proximity-state,
+.proximity-hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.proximity-title {
+  font-size: 10px;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.proximity-state {
+  color: var(--muted-brown);
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.proximity-hint {
+  color: #315c45;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.proximity-card[data-primary="false"] .proximity-state,
+.proximity-card[data-primary="false"] .proximity-hint {
+  display: none;
+}
+
 .joystick-zone {
   position: absolute;
   z-index: 7;
@@ -586,9 +683,242 @@ h1 {
 }
 
 .camera-controls button:focus-visible,
-.dossier button:focus-visible {
+.dossier button:focus-visible,
+.guide-encounter button:focus-visible {
   outline: 3px solid #fff7bf;
   outline-offset: -4px;
+}
+
+.guide-encounter {
+  position: absolute;
+  left: max(7px, env(safe-area-inset-left));
+  right: max(7px, env(safe-area-inset-right));
+  bottom: max(7px, env(safe-area-inset-bottom));
+  z-index: 14;
+  max-height: 43%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: 5px;
+  overflow: hidden;
+  border: 3px solid #2b1c20;
+  border-radius: 13px 13px 9px 9px;
+  padding: 7px 8px 8px;
+  background:
+    linear-gradient(90deg, transparent 0 7px, #f6cb6a22 7px 9px, transparent 9px calc(100% - 9px), #f6cb6a22 calc(100% - 9px) calc(100% - 7px), transparent calc(100% - 7px)),
+    linear-gradient(180deg, #4d2f2beF, #291f25f7);
+  color: #fff3d4;
+  box-shadow: 4px 4px 0 #142724cc, inset 0 0 0 2px #d69647, inset 0 0 0 4px #6f3f2f;
+  touch-action: manipulation;
+  animation: guide-enter 180ms steps(3, end);
+}
+
+.guide-encounter[hidden] {
+  display: none;
+}
+
+.guide-nameplate {
+  min-width: 0;
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 7px;
+}
+
+.guide-portrait {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 3px solid #25191d;
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, #6b9f74 0 58%, #416755 58% 100%);
+  box-shadow: inset 0 0 0 2px #e9c65c, 2px 2px 0 #120f12;
+}
+
+.guide-portrait::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 10px;
+  width: 17px;
+  height: 19px;
+  background: #e8b67c;
+  box-shadow:
+    -4px -6px 0 #30463f,
+    0 -8px 0 #30463f,
+    4px -6px 0 #30463f,
+    -8px 12px 0 #75513c,
+    8px 12px 0 #75513c,
+    0 18px 0 5px #b56c42;
+}
+
+.guide-portrait::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  width: 3px;
+  height: 3px;
+  background: #263c38;
+  box-shadow: 8px 0 0 #263c38, 4px 7px 0 #9b513b;
+}
+
+.guide-portrait span {
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  z-index: 2;
+  width: 28px;
+  height: 5px;
+  background: #273d39;
+  box-shadow: 5px -4px 0 -1px #d0a94d;
+}
+
+.guide-identity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.guide-speaker {
+  overflow: hidden;
+  color: #ffd66f;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: .04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.guide-role,
+.guide-mode-label {
+  color: #d9c0a5;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.guide-close,
+.guide-actions button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid #1d1518;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #83523d, #553229);
+  color: #fff0d3;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: inset 0 -3px 0 #342027;
+  touch-action: manipulation;
+}
+
+.guide-close {
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.guide-dialogue {
+  min-height: 0;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  overflow: hidden;
+  border-top: 1px solid #9e6445;
+  border-bottom: 1px solid #9e6445;
+  padding: 5px 2px;
+}
+
+.guide-dialogue h2 {
+  overflow: hidden;
+  color: #fff0bd;
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guide-dialogue p {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #f6e6cf;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.28;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.guide-quest-cue {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #4f7e55;
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #203d31;
+}
+
+.guide-quest-cue span {
+  color: #9fd98e;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.guide-quest-cue strong {
+  overflow: hidden;
+  color: #eaf5c9;
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guide-progress {
+  color: #d5b67f;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.guide-actions {
+  display: grid;
+  grid-template-columns: 70px minmax(0, .9fr) minmax(0, 1fr);
+  gap: 5px;
+}
+
+.guide-actions button:disabled {
+  opacity: .38;
+}
+
+.guide-actions .guide-next {
+  border-color: #172b25;
+  background: linear-gradient(180deg, #b4d47b, #6f9c5c);
+  color: #1e3c31;
+  box-shadow: inset 0 -3px 0 #477448;
+}
+
+.guide-encounter[data-mode="notes"] .guide-quest-cue {
+  border-color: #8a6b42;
+  background: #3f3027;
+}
+
+@keyframes guide-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dossier {
@@ -813,6 +1143,19 @@ h1 {
   .dossier {
     left: auto;
     width: 342px;
+  }
+
+  .guide-encounter {
+    top: 7px;
+    left: auto;
+    right: 7px;
+    bottom: 7px;
+    width: min(342px, 43%);
+    max-height: none;
+  }
+
+  .guide-dialogue p {
+    -webkit-line-clamp: 4;
   }
 
   .touch-hint {

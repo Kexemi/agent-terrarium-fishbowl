@@ -45,6 +45,8 @@
 
     <div class="action-toast" id="actionToast" data-visible="false" data-tone="ok" role="status" aria-live="polite">Ready.</div>
 
+    <div class="proximity-layer" id="proximityLayer" data-count="0" aria-live="polite" aria-label="Nothing nearby"></div>
+
     <div class="joystick-zone" id="joystickZone" data-side="left" aria-label="Floating movement joystick" aria-hidden="true">
       <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
     </div>
@@ -54,6 +56,32 @@
       <button id="cameraRecenter" type="button" aria-label="Recenter camera on player">◎</button>
       <button id="worldZoomIn" type="button" aria-label="Zoom world in">＋</button>
     </nav>
+
+    <section class="guide-encounter" id="guideEncounter" data-open="false" data-mode="story" data-page="0" aria-label="Conversation with the Terrarium Keeper" aria-live="polite" hidden>
+      <div class="guide-nameplate">
+        <div class="guide-portrait" id="guidePortrait" aria-hidden="true"><span></span></div>
+        <div class="guide-identity">
+          <span class="guide-speaker" id="guideSpeaker">Terrarium Keeper</span>
+          <span class="guide-role">Keeper of proof &amp; gates</span>
+        </div>
+        <button class="guide-close" id="guideClose" type="button" aria-label="Return to the world">×</button>
+      </div>
+      <div class="guide-dialogue">
+        <span class="guide-mode-label" id="guideModeLabel">Field lesson</span>
+        <h2 id="guideDialogueTitle">The world listens</h2>
+        <p id="guideDialogueBody">Tell the crew where you want to go. They will handle the machinery and return with proof.</p>
+      </div>
+      <div class="guide-quest-cue">
+        <span>Next quest</span>
+        <strong id="guideQuestCue">Move once, then meet a worker.</strong>
+      </div>
+      <div class="guide-progress" id="guideProgress" aria-label="Guide page 1 of 5">1 / 5 · First steps</div>
+      <nav class="guide-actions" aria-label="Guide conversation actions">
+        <button id="guideBack" type="button">Back</button>
+        <button id="guideNotes" type="button">Field notes</button>
+        <button id="guideNext" class="guide-next" type="button">Next</button>
+      </nav>
+    </section>
 
     <section class="dossier" id="inspector" data-dossier-state="compact" tabindex="0" aria-label="selected place dossier" aria-live="polite">
       <div class="dossier-heading">

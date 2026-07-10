@@ -1,44 +1,44 @@
 {
   "id": "owner-ops-shrine",
-  "title": "Owner Ops Shrine",
+  "title": "Terrarium Keeper",
   "visible_as": "owner_guide",
-  "version": "0.1.0",
-  "summary": "How to run AI-OS from inside the game: what to say, ignore, approve, and how outcomes show up.",
+  "version": "0.2.0",
+  "summary": "Meet the Keeper for a short field lesson, then return to the world with one clear quest.",
   "say": [
-    "Plain intent: what you want done or decided — not command lists.",
-    "Hard gates only: one short APPROVE … line when spend/send/deploy/delete/public tunnel is real.",
-    "Corrections: “still not a game,” “I have no link,” “this still feels like a dashboard.”",
-    "Outcomes language: “open the link,” “show proof,” “what needs me?”"
+    "Plain intent: tell the crew what outcome you want — not which commands to run.",
+    "Ask for relief in ordinary language: show proof, open the link, or tell me what needs me.",
+    "Correct the world directly: this is not a game yet, I have no link, or this still feels like a dashboard.",
+    "Choose the destination; the crew chooses the safe route and returns with evidence."
   ],
   "ignore": [
-    "Process IDs, loop heartbeats, and [SILENT] cron noise.",
+    "Process IDs, loop heartbeats, and silent cron noise.",
     "Green technical PASS without a phone-openable artifact or screenshot.",
     "Raw vault paths as the primary handoff when you are on phone.",
-    "Asking you to run scripts the agent can run itself."
+    "Requests to run scripts the crew can safely run itself."
   ],
   "approve": [
-    "Credentials / API keys / auth login.",
-    "Spend, live trades, paid generation beyond agreed caps.",
-    "External send, publish, deploy, push/merge, public tunnels.",
-    "Deletes and permanent theme/canon changes.",
-    "Curated vault writes outside Inbox / Logs / Social Archives."
+    "Credentials, API keys, and account sign-in.",
+    "Spend, live trades, or paid generation beyond an agreed cap.",
+    "External send, publish, deploy, push or merge, and public tunnels.",
+    "Deletion and permanent theme or canon changes.",
+    "Curated vault writes outside Inbox, Logs, or Social Archives."
   ],
   "outcomes": [
-    "Quest banner + game message = current objective and last consequence.",
-    "Proof meter rises when you gather receipt lights (not when a model claims PASS).",
-    "Follow agent (F) mirrors a real worker; Gate check never auto-unlocks hard gates.",
-    "Owner Cockpit / spectator: Start here → Now → Timeline → Proof → Gates.",
-    "If autonomy is blind: demand the cockpit link before more loop work."
+    "The quest banner names the current objective; the game message names the last consequence.",
+    "Receipt lights raise proof. A model claiming PASS does not.",
+    "A followed worker mirrors a real run; a gate check never unlocks a hard gate.",
+    "Fog means evidence is missing. Gather proof before trying to clear it.",
+    "If the crew becomes invisible, ask for the owner cockpit before more loop work."
   ],
   "first_30_seconds": [
-    "Move with pad/WASD through the working room.",
-    "Tap Owner guide (or press G near the shrine).",
-    "Follow an agent, gather one proof light, gate-check a locked door.",
-    "Only approve if a real hard gate appears with a copyable APPROVE line."
+    "Move through the working room with the floating pad or WASD.",
+    "Meet the Terrarium Keeper at the guidepost, or press G from anywhere.",
+    "Follow one worker, gather one proof light, then inspect a locked gate.",
+    "Approve only when a real hard gate appears with one clear approval line."
   ],
   "source_path": "Repos/Agent-Terrarium-Prototype/public/owner_guide.json",
-  "timestamp": "2026-07-08T23:40:00Z",
-  "proof_status": "owner_guide_v0_in_game",
+  "timestamp": "2026-07-10T17:52:00Z",
+  "proof_status": "owner_guide_encounter_v1",
   "next_event": "owner_guide_opened",
   "x": 8,
   "y": 14,

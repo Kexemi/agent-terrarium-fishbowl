@@ -168,18 +168,18 @@ function verbsFor(entity) {
 export function defaultOwnerGuideObject() {
   return {
     entity_id: 'owner-ops-shrine',
-    title: 'Owner Ops Shrine',
+    title: 'Terrarium Keeper',
     visible_as: 'owner_guide',
     source_path: 'Repos/Agent-Terrarium-Prototype/public/owner_guide.json',
     timestamp: '2026-07-08T23:40:00Z',
-    proof_status: 'owner_guide_v0_in_game',
+    proof_status: 'owner_guide_encounter_v1',
     state: 'source_backed',
     next_event: 'owner_guide_opened',
     x: 8,
     y: 14,
     w: 5,
     h: 4,
-    body: 'How to run AI-OS from inside the game: what to say, ignore, approve, and how outcomes show up.',
+    body: 'Meet the Keeper for a short field lesson, then return to the world with one clear quest.',
     owner_guide: {
       say: [
         'Plain intent: what you want done or decided — not command lists.',
@@ -209,7 +209,7 @@ export function defaultOwnerGuideObject() {
       ],
       first_30_seconds: [
         'Move with pad/WASD through the working room.',
-        'Open Owner guide (verb or G near the shrine).',
+        'Meet the Terrarium Keeper at the guidepost, or press G from anywhere.',
         'Follow an agent, gather one proof light, gate-check a locked door.',
         'Only approve if a real hard gate appears with a copyable APPROVE line.',
       ],
@@ -334,7 +334,7 @@ export function normalizeWorldForEngine(rawWorld, options = {}) {
     entities = legacy;
   }
 
-  // Diegetic owner ops shrine: always present so campaign mode lives in-game.
+  // Diegetic Keeper guidepost: always present so campaign literacy lives in play.
   if (!entities.some((entity) => entity.visible_as === 'owner_guide')) {
     const guideRaw = raw.owner_guide || raw.ownerGuide || defaultOwnerGuideObject();
     entities.push(
@@ -581,7 +581,7 @@ function createInitialGameState(world, prior = {}) {
     followedAgentId: prior.followedAgentId || null,
     gateChecks: finiteNumber(prior.gateChecks, 0),
     ownerGuideOpen: Boolean(prior.ownerGuideOpen),
-    message: prior.message || 'Wake in the working room: open Owner guide (G), gather proof, inspect agents, clear fog, respect hard gates.',
+    message: prior.message || 'Wake in the working room: meet the Terrarium Keeper (G), gather proof, inspect workers, clear fog, respect hard gates.',
     activeQuestId: prior.activeQuestId || null,
     nearbyEntityId: prior.nearbyEntityId || null,
     questLog: [],
@@ -589,11 +589,115 @@ function createInitialGameState(world, prior = {}) {
   return refreshQuestLog(world, game);
 }
 
+function proximityRadiusFor(entity) {
+  switch (entity?.visible_as) {
+    case 'agent_sprite': return 5.5;
+    case 'building':
+    case 'source_root': return 5;
+    case 'owner_guide': return 5.5;
+    case 'receipt_light':
+    case 'resource_light': return 3.2;
+    case 'fog_alarm': return 4.2;
+    case 'locked_door': return 5;
+    case 'quest': return 4.5;
+    default: return 4;
+  }
+}
+
+function proximityDistanceTiles(engine, entity) {
+  const playerX = engine.player.x / TILE;
+  const playerY = engine.player.y / TILE;
+  if (['agent_sprite', 'receipt_light', 'resource_light'].includes(entity.visible_as)) {
+    const center = entityCenter(entity);
+    return Math.hypot(center.x - playerX, center.y - playerY);
+  }
+  const left = finiteNumber(entity.renderX ?? entity.x, 0);
+  const top = finiteNumber(entity.renderY ?? entity.y, 0);
+  const right = left + Math.max(1, finiteNumber(entity.w, 1));
+  const bottom = top + Math.max(1, finiteNumber(entity.h, 1));
+  const nearestX = clamp(playerX, left, right);
+  const nearestY = clamp(playerY, top, bottom);
+  return Math.hypot(nearestX - playerX, nearestY - playerY);
+}
+
+function proximityAnchor(entity) {
+  const x = finiteNumber(entity.renderX ?? entity.x, 0);
+  const y = finiteNumber(entity.renderY ?? entity.y, 0);
+  if (entity.visible_as === 'agent_sprite') return { x, y: y - 1.15 };
+  if (['receipt_light', 'resource_light'].includes(entity.visible_as)) return { x, y: y - 0.8 };
+  return {
+    x: x + Math.max(1, finiteNumber(entity.w, 1)) / 2,
+    y: y - 0.3,
+  };
+}
+
+function proximityStateLabel(engine, entity) {
+  if (entity.collected || hasId(engine.game?.collectedIds, entity.id)) return 'Proof gathered';
+  if (entity.cleared || hasId(engine.game?.clearedFogIds, entity.id)) return 'Fog cleared';
+  if (engine.game?.followedAgentId === entity.id || entity.following) return 'Following you';
+  if (entity.locked || entity.visible_as === 'locked_door') return 'Locked';
+  const raw = String(entity.state || entity.role || 'Nearby').replace(/^following_player_/, '').replace(/[_-]+/g, ' ').trim();
+  return raw ? raw.replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Nearby';
+}
+
+function proximityTone(engine, entity) {
+  if (entity.collected || hasId(engine.game?.collectedIds, entity.id)) return 'quiet';
+  if (entity.cleared || hasId(engine.game?.clearedFogIds, entity.id)) return 'calm';
+  if (entity.locked || entity.visible_as === 'locked_door') return 'blocked';
+  if (entity.visible_as === 'fog_alarm') return 'warning';
+  if (['receipt_light', 'resource_light'].includes(entity.visible_as)) return 'ready';
+  if (engine.game?.followedAgentId === entity.id || entity.following) return 'active';
+  if (/missing|stale|blocked|failed|warn/i.test(`${entity.state || ''} ${entity.proofStatus || ''}`)) return 'warning';
+  return engine.selectedId === entity.id ? 'focus' : 'calm';
+}
+
+function proximityHint(engine, entity) {
+  switch (entity.visible_as) {
+    case 'agent_sprite': return engine.game?.followedAgentId === entity.id || entity.following ? 'Following you' : 'Follow worker';
+    case 'building':
+    case 'source_root': return 'Inspect place';
+    case 'owner_guide': return 'Open guide';
+    case 'receipt_light':
+    case 'resource_light': return entity.collected || hasId(engine.game?.collectedIds, entity.id) ? 'Proof gathered' : 'Gather proof';
+    case 'fog_alarm': return entity.cleared || hasId(engine.game?.clearedFogIds, entity.id) ? 'Fog cleared' : 'Clear with proof';
+    case 'locked_door': return 'Owner approval required';
+    case 'quest': return 'View objective';
+    default: return 'Inspect nearby';
+  }
+}
+
+export function getProximityInfo(engine, options = {}) {
+  if (!engine?.world || !engine?.player) return [];
+  const requestedLimit = Number.isFinite(Number(options.limit)) ? Math.floor(Number(options.limit)) : 3;
+  const limit = clamp(requestedLimit, 0, 50);
+  if (limit === 0) return [];
+  const overrideRadius = Number.isFinite(Number(options.radiusTiles)) ? Math.max(0, Number(options.radiusTiles)) : null;
+  const ranked = engine.world.entities
+    .map((entity) => ({ entity, distance: proximityDistanceTiles(engine, entity) }))
+    .filter(({ entity, distance }) => distance <= (overrideRadius ?? proximityRadiusFor(entity)))
+    .sort((a, b) => a.distance - b.distance || String(a.entity.id).localeCompare(String(b.entity.id)))
+    .slice(0, limit)
+    .map(({ entity, distance }, index) => ({
+      id: String(entity.id),
+      title: String(entity.title || entity.id),
+      kind: String(entity.visible_as || entity.engineKind || entity.kind || 'entity'),
+      stateLabel: proximityStateLabel(engine, entity),
+      hint: proximityHint(engine, entity),
+      tone: proximityTone(engine, entity),
+      distanceTiles: Number(distance.toFixed(2)),
+      anchor: proximityAnchor(entity),
+      primary: index === 0,
+      selected: engine.selectedId === entity.id,
+      following: engine.game?.followedAgentId === entity.id || Boolean(entity.following),
+    }));
+  return ranked;
+}
+
 function updateNearby(engine) {
   if (!engine?.game) return null;
-  const near = nearestEntityForAction(engine, () => true, 3.1);
+  const near = getProximityInfo(engine, { limit: 1 })[0] || null;
   engine.game.nearbyEntityId = near?.id || null;
-  return near;
+  return near?.id ? entityById(engine.world, near.id) : null;
 }
 
 function pushGameEvent(engine, type, payload = {}) {
@@ -638,7 +742,7 @@ export function getGameHud(engine) {
     nearbyEntityId: engine.game.nearbyEntityId,
     message: engine.game.message,
     ownerGuideOpen: Boolean(engine.game.ownerGuideOpen),
-    controls: ['followAgent', 'inspectNearest', 'collectProof', 'clearFog', 'unlockGate', 'openOwnerGuide'],
+    controls: ['followAgent', 'inspectNearest', 'collectProof', 'clearFog', 'unlockGate', 'openOwnerGuide', 'closeOwnerGuide'],
   };
 }
 
@@ -947,14 +1051,14 @@ export function performTerrariumAction(engine, action) {
       || engine.world.entities.find((item) => item.visible_as === 'owner_guide')
       || null;
     if (!entity) {
-      engine.game.message = 'Owner Ops Shrine is missing from this world.';
+      engine.game.message = 'The Terrarium Keeper is missing from this world.';
       return { ok: false, action: verb, reason: 'no_owner_guide', message: engine.game.message };
     }
     engine.selectedId = entity.id;
     engine.game.inspectedIds = addId(engine.game.inspectedIds, entity.id);
     engine.game.ownerGuideOpen = true;
     engine.game.signal += 1;
-    engine.game.message = 'Owner guide open: say plain intent · ignore heartbeats · approve only real gates · outcomes live in proof + quest.';
+    engine.game.message = 'The Terrarium Keeper has a field lesson for you.';
     pushGameEvent(engine, 'owner_guide_opened', {
       entityId: entity.id,
       sections: ['say', 'ignore', 'approve', 'outcomes', 'first_30_seconds'],
@@ -968,6 +1072,13 @@ export function performTerrariumAction(engine, action) {
       gainedSignal: 1,
       message: engine.game.message,
     };
+  }
+
+  if (['closeOwnerGuide', 'closeGuide'].includes(verb)) {
+    engine.game.ownerGuideOpen = false;
+    engine.game.message = 'Guide closed. The world is yours again.';
+    pushGameEvent(engine, 'owner_guide_closed', { entityId: engine.selectedId || null });
+    return { ok: true, action: verb, message: engine.game.message };
   }
 
   engine.game.message = `Unknown verb: ${verb || 'empty'}.`;
@@ -1049,8 +1160,8 @@ export function getRenderScene(engine) {
     engineKind: entity.engineKind,
     x: entity.renderX ?? entity.x,
     y: entity.renderY ?? entity.y,
-    w: entity.w,
-    h: entity.h,
+    w: ['agent_sprite', 'receipt_light', 'resource_light'].includes(entity.visible_as) ? 1 : entity.w,
+    h: ['agent_sprite', 'receipt_light', 'resource_light'].includes(entity.visible_as) ? 1 : entity.h,
     amount: entity.amount,
     state: entity.state,
     mood: entity.mood,

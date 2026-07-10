@@ -9,6 +9,7 @@ import {
   performTerrariumAction,
   getGameHud,
   getRenderScene,
+  getProximityInfo,
   snapshotEngine,
   applyWorldSnapshot,
   joystickMagnitudeForDistance,
@@ -52,6 +53,7 @@ const controlSideToggle = document.getElementById('controlSideToggle');
 const replayTouchHint = document.getElementById('replayTouchHint');
 const touchHint = document.getElementById('touchHint');
 const actionToast = document.getElementById('actionToast');
+const proximityLayer = document.getElementById('proximityLayer');
 const instructions = document.querySelector('.instructions');
 const proofValue = document.getElementById('proofValue');
 const signalValue = document.getElementById('signalValue');
@@ -63,6 +65,17 @@ const briefHealth = document.getElementById('briefHealth');
 const briefWork = document.getElementById('briefWork');
 const briefGate = document.getElementById('briefGate');
 const briefFresh = document.getElementById('briefFresh');
+const guideEncounter = document.getElementById('guideEncounter');
+const guideSpeaker = document.getElementById('guideSpeaker');
+const guideModeLabel = document.getElementById('guideModeLabel');
+const guideDialogueTitle = document.getElementById('guideDialogueTitle');
+const guideDialogueBody = document.getElementById('guideDialogueBody');
+const guideQuestCue = document.getElementById('guideQuestCue');
+const guideProgress = document.getElementById('guideProgress');
+const guideBack = document.getElementById('guideBack');
+const guideNotes = document.getElementById('guideNotes');
+const guideNext = document.getElementById('guideNext');
+const guideClose = document.getElementById('guideClose');
 
 const WORLD_REFRESH_MS = 15_000;
 const FIXED_STEP_MS = 1000 / 60;
@@ -76,6 +89,19 @@ const fullMapMode = queryParams.get('full-map') === '1';
 if (fullMapMode) document.documentElement.dataset.fullMap = 'true';
 const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
 const runtimeDebugEnabled = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+const visualViewport = window.visualViewport;
+
+function syncVisualViewportHeight() {
+  const measured = visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 665;
+  const nextHeight = Math.max(240, Math.floor(measured));
+  const previousHeight = Number(document.documentElement.dataset.visualViewportHeight || 0);
+  document.documentElement.style.setProperty('--app-viewport-height', `${nextHeight}px`);
+  document.documentElement.dataset.visualViewportHeight = String(nextHeight);
+  document.documentElement.dataset.visualViewportLocked = 'true';
+  if (window.scrollY !== 0) window.scrollTo(0, 0);
+  if (previousHeight !== nextHeight) window.requestAnimationFrame(resizeCanvas);
+  return nextHeight;
+}
 
 const keys = new Set();
 function loadMovementSide() {
@@ -116,6 +142,10 @@ const state = {
   selected: null,
   rawProofOpen: false,
   dossierState: 'compact',
+  guideOpen: false,
+  guideMode: 'story',
+  guidePage: 0,
+  guideQuestStarted: false,
   logOpen: false,
   snapshotVersion: '',
   lastRefreshAt: '',
@@ -521,29 +551,164 @@ function updateInspector() {
   const mode = state.mode === 'live' ? '' : ' Offline view: confirm live state before trusting it.';
   const proofOnlyDetail = state.rawProofOpen ? `${next}${architectureNote}` : '';
   const guide = details?.ownerGuide || item.ownerGuide || null;
-  if (guide && (item.visible_as === 'owner_guide' || details?.kind === 'owner_guide' || state.engine?.game?.ownerGuideOpen)) {
-    selectedState.textContent = 'Owner ops';
-    selectedBody.textContent = formatOwnerGuideBody(guide, details?.body || item.body || '');
+  if (guide && (item.visible_as === 'owner_guide' || details?.kind === 'owner_guide')) {
+    selectedState.textContent = 'Keeper ready';
+    selectedBody.textContent = 'Speak with the Terrarium Keeper for one short lesson and a playable first quest.';
   } else {
     selectedBody.textContent = `${details?.body || item.body || 'No description.'}${proofOnlyDetail}${mode}`;
   }
   renderProofLine(details, item);
 }
 
-function formatOwnerGuideBody(guide, summary) {
-  const section = (title, rows) => {
-    const list = Array.isArray(rows) ? rows : [];
-    if (!list.length) return '';
-    return `${title}\n- ${list.slice(0, 5).join('\n- ')}`;
-  };
-  return [
-    summary || 'Owner operating guide.',
-    section('SAY', guide.say),
-    section('IGNORE', guide.ignore),
-    section('APPROVE', guide.approve),
-    section('OUTCOMES', guide.outcomes),
-    section('FIRST 30s', guide.first_30_seconds || guide.first30Seconds),
-  ].filter(Boolean).join('\n\n');
+function compactGuideText(value, limit = 220) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (text.length <= limit) return text;
+  return `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
+function currentOwnerGuide() {
+  const selectedGuide = state.selected?.ownerGuide;
+  if (selectedGuide) return selectedGuide;
+  return state.world?.entities?.find((entity) => entity.visible_as === 'owner_guide')?.ownerGuide || {};
+}
+
+function buildOwnerGuideEncounterPages(guide = {}) {
+  const say = Array.isArray(guide.say) ? guide.say : [];
+  const ignore = Array.isArray(guide.ignore) ? guide.ignore : [];
+  const approve = Array.isArray(guide.approve) ? guide.approve : [];
+  const outcomes = Array.isArray(guide.outcomes) ? guide.outcomes : [];
+  const first = Array.isArray(guide.first_30_seconds || guide.first30Seconds)
+    ? (guide.first_30_seconds || guide.first30Seconds)
+    : [];
+  const story = [
+    {
+      title: 'The world listens',
+      body: compactGuideText(`You choose the destination. ${say[0] || 'Tell the crew the outcome you want; they handle the machinery.'}`),
+      cue: first[0] || 'Move once, then meet a worker.',
+      chapter: 'First steps',
+    },
+    {
+      title: 'Speak in outcomes',
+      body: compactGuideText(say[1] || 'Ask in ordinary language: show proof, open the link, or tell me what needs me.'),
+      cue: 'Try: “Show me what changed.”',
+      chapter: 'Your voice',
+    },
+    {
+      title: 'Only real gates stop you',
+      body: compactGuideText(`The crew keeps moving until a real gate appears: ${approve.slice(0, 3).join(' ')}`),
+      cue: 'Locked doors never open themselves.',
+      chapter: 'Hard gates',
+    },
+    {
+      title: 'Proof changes the terrain',
+      body: compactGuideText(outcomes.slice(0, 3).join(' ')),
+      cue: 'Receipt light → proof. Fog → missing evidence.',
+      chapter: 'World truth',
+    },
+    {
+      title: 'Your first field quest',
+      body: compactGuideText(first.slice(1).join(' ')),
+      cue: 'Follow a worker → gather proof → inspect a gate.',
+      chapter: 'Quest ready',
+    },
+  ];
+  const noteSections = [
+    ['What to say', say],
+    ['What to ignore', ignore],
+    ['What needs approval', approve],
+    ['How outcomes appear', outcomes],
+    ['First 30 seconds', first],
+  ];
+  const notes = noteSections.flatMap(([title, rows]) => {
+    const sourceRows = rows.length ? rows : ['No source-backed notes available.'];
+    return sourceRows.map((row, index) => ({
+      title: `${title} · Field Notes ${index + 1}/${sourceRows.length}`,
+      body: compactGuideText(row, 220),
+      cue: title === 'What needs approval' ? 'When in doubt, the gate stays locked.' : 'Source-backed field note. Nothing hidden below the fold.',
+      chapter: 'Field notes',
+    }));
+  });
+  return { story, notes };
+}
+
+function renderGuideEncounter() {
+  if (!guideEncounter) return;
+  const pagesByMode = buildOwnerGuideEncounterPages(currentOwnerGuide());
+  const mode = state.guideMode === 'notes' ? 'notes' : 'story';
+  const pages = pagesByMode[mode];
+  state.guidePage = clamp(state.guidePage, 0, Math.max(0, pages.length - 1));
+  const page = pages[state.guidePage] || pages[0];
+  guideEncounter.hidden = !state.guideOpen;
+  guideEncounter.dataset.open = state.guideOpen ? 'true' : 'false';
+  guideEncounter.dataset.mode = mode;
+  guideEncounter.dataset.page = String(state.guidePage);
+  guideSpeaker.textContent = 'Terrarium Keeper';
+  guideModeLabel.textContent = mode === 'story' ? 'Field lesson' : 'Source-backed codex';
+  guideDialogueTitle.textContent = page.title;
+  guideDialogueBody.textContent = page.body;
+  guideQuestCue.textContent = page.cue;
+  guideProgress.textContent = `${state.guidePage + 1} / ${pages.length} · ${page.chapter}`;
+  guideProgress.setAttribute('aria-label', `Guide page ${state.guidePage + 1} of ${pages.length}`);
+  guideBack.disabled = state.guidePage === 0;
+  guideNotes.textContent = mode === 'story' ? 'Field notes' : 'Story';
+  guideNext.textContent = mode === 'story' && state.guidePage === pages.length - 1
+    ? 'Begin quest'
+    : mode === 'notes' && state.guidePage === pages.length - 1
+      ? 'Return to story'
+      : 'Next';
+}
+
+function openGuideEncounter(guide = currentOwnerGuide()) {
+  if (!guideEncounter) return false;
+  resetAllInput('guide_open');
+  setDossierState('compact');
+  state.guideOpen = true;
+  state.guideMode = 'story';
+  state.guidePage = 0;
+  state.guideSource = guide;
+  inspector.hidden = true;
+  document.documentElement.dataset.guideOpen = 'true';
+  renderGuideEncounter();
+  if (actionToast) actionToast.dataset.visible = 'false';
+  return true;
+}
+
+function closeGuideEncounter({ beginQuest = false } = {}) {
+  if (!guideEncounter) return false;
+  resetAllInput(beginQuest ? 'guide_begin_quest' : 'guide_close');
+  state.guideOpen = false;
+  state.guideQuestStarted = state.guideQuestStarted || beginQuest;
+  guideEncounter.dataset.open = 'false';
+  guideEncounter.hidden = true;
+  inspector.hidden = false;
+  setDossierState('compact');
+  delete document.documentElement.dataset.guideOpen;
+  if (state.engine) performTerrariumAction(state.engine, 'closeOwnerGuide');
+  if (beginQuest && state.engine) {
+    state.engine.game.message = 'Quest marked: follow a worker, gather one proof light, then inspect a locked gate.';
+  }
+  updateGameHud();
+  return true;
+}
+
+function setGuideMode(mode) {
+  state.guideMode = mode === 'notes' ? 'notes' : 'story';
+  state.guidePage = 0;
+  renderGuideEncounter();
+}
+
+function advanceGuideEncounter() {
+  const pages = buildOwnerGuideEncounterPages(currentOwnerGuide())[state.guideMode === 'notes' ? 'notes' : 'story'];
+  if (state.guideMode === 'story' && state.guidePage >= pages.length - 1) {
+    closeGuideEncounter({ beginQuest: true });
+    return;
+  }
+  if (state.guideMode === 'notes' && state.guidePage >= pages.length - 1) {
+    setGuideMode('story');
+    return;
+  }
+  state.guidePage += 1;
+  renderGuideEncounter();
 }
 
 function formatStateLabel(raw) {
@@ -653,14 +818,158 @@ function resizeCanvas() {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 }
 
+let proximitySignature = '';
+
+function clearProximityLayer() {
+  if (!proximityLayer) return;
+  if (proximitySignature || proximityLayer.childElementCount) proximityLayer.replaceChildren();
+  proximitySignature = '';
+  proximityLayer.dataset.count = '0';
+  proximityLayer.dataset.ids = '';
+  proximityLayer.setAttribute('aria-label', 'Nothing nearby');
+}
+
+function createProximityCard(entry) {
+  const card = document.createElement('div');
+  card.className = 'proximity-card';
+  card.dataset.entityId = entry.id;
+  card.dataset.kind = entry.kind;
+  card.dataset.tone = entry.tone;
+  card.dataset.primary = entry.primary ? 'true' : 'false';
+  card.setAttribute('aria-hidden', 'true');
+
+  const dot = document.createElement('span');
+  dot.className = 'proximity-dot';
+  const copy = document.createElement('span');
+  copy.className = 'proximity-copy';
+  const title = document.createElement('b');
+  title.className = 'proximity-title';
+  title.textContent = entry.title;
+  const stateText = document.createElement('span');
+  stateText.className = 'proximity-state';
+  stateText.textContent = entry.stateLabel;
+  const hint = document.createElement('span');
+  hint.className = 'proximity-hint';
+  hint.textContent = entry.hint;
+  copy.replaceChildren(title, stateText, hint);
+  card.replaceChildren(dot, copy);
+  return card;
+}
+
+function rectOverlapArea(a, b, padding = 0) {
+  const width = Math.max(0, Math.min(a.right, b.right + padding) - Math.max(a.left, b.left - padding));
+  const height = Math.max(0, Math.min(a.bottom, b.bottom + padding) - Math.max(a.top, b.top - padding));
+  return width * height;
+}
+
+function renderProximityLayer() {
+  if (!proximityLayer || !state.engine || state.dossierState === 'expanded' || state.guideOpen) {
+    clearProximityLayer();
+    return [];
+  }
+  const entries = getProximityInfo(state.engine, { limit: 3 });
+  const signature = entries.map((entry) => [entry.id, entry.kind, entry.stateLabel, entry.hint, entry.tone, entry.primary].join('|')).join('::');
+  if (signature !== proximitySignature) {
+    const fragment = document.createDocumentFragment();
+    entries.forEach((entry) => fragment.append(createProximityCard(entry)));
+    proximityLayer.replaceChildren(fragment);
+    proximitySignature = signature;
+  }
+  if (!entries.length) {
+    proximityLayer.dataset.count = '0';
+    proximityLayer.dataset.ids = '';
+    proximityLayer.setAttribute('aria-label', 'Nothing nearby');
+    return [];
+  }
+
+  const layerRect = proximityLayer.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  const canvasOffsetX = canvasRect.left - layerRect.left;
+  const canvasOffsetY = canvasRect.top - layerRect.top;
+  const dossierRect = inspector?.getBoundingClientRect?.();
+  const usableBottom = dossierRect?.height
+    ? Math.min(layerRect.height - 8, dossierRect.top - layerRect.top - 8)
+    : layerRect.height - 8;
+  const zoom = inputState.worldZoom || 1;
+  const blockedSelectors = ['.camera-controls', '.world-badge', '.touch-hint', '.morning-brief', '.game-hud'];
+  const blocked = blockedSelectors.map((selector) => document.querySelector(selector)).filter(Boolean).map((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) return null;
+    return { left: rect.left - layerRect.left, top: rect.top - layerRect.top, right: rect.right - layerRect.left, bottom: rect.bottom - layerRect.top };
+  }).filter(Boolean);
+  const playerScreen = {
+    left: canvasOffsetX + (state.player.x - state.camera.x) * zoom - 25,
+    right: canvasOffsetX + (state.player.x - state.camera.x) * zoom + 25,
+    top: canvasOffsetY + (state.player.y - state.camera.y) * zoom - 55,
+    bottom: canvasOffsetY + (state.player.y - state.camera.y) * zoom + 20,
+  };
+  const placed = [];
+  const displayed = [];
+  const cards = [...proximityLayer.querySelectorAll('.proximity-card')];
+  entries.forEach((entry, index) => {
+    const card = cards[index];
+    if (!card) return;
+    card.hidden = false;
+    card.dataset.distance = String(entry.distanceTiles);
+    const width = card.offsetWidth || (entry.primary ? 156 : 136);
+    const height = card.offsetHeight || (entry.primary ? 48 : 32);
+    const anchorX = canvasOffsetX + (entry.anchor.x * TILE - state.camera.x) * zoom;
+    const anchorY = canvasOffsetY + (entry.anchor.y * TILE - state.camera.y) * zoom;
+    const obstacles = [...blocked, playerScreen, ...placed];
+    const minLeft = 8;
+    const maxLeft = Math.max(8, layerRect.width - width - 8);
+    const minTop = 8;
+    const maxTop = Math.max(8, usableBottom - height);
+    const makeCandidate = (rawLeft, rawTop) => {
+      const left = clamp(rawLeft, minLeft, maxLeft);
+      const top = clamp(rawTop, minTop, maxTop);
+      return { left, top, right: left + width, bottom: top + height };
+    };
+    const rawCandidates = [
+      [anchorX - width / 2, anchorY - height - 14],
+      [anchorX + 36, anchorY - height / 2],
+      [anchorX - width - 36, anchorY - height / 2],
+      [anchorX - width / 2, anchorY + 20],
+      [anchorX + 30, anchorY - height - 18],
+      [anchorX - width - 30, anchorY - height - 18],
+      [anchorX + 30, anchorY + 18],
+      [anchorX - width - 30, anchorY + 18],
+    ];
+    if (entry.primary) rawCandidates.push(
+      [playerScreen.right + 8, playerScreen.top + (playerScreen.bottom - playerScreen.top - height) / 2],
+      [playerScreen.left - width - 8, playerScreen.top + (playerScreen.bottom - playerScreen.top - height) / 2],
+      [anchorX - width / 2, playerScreen.top - height - 8],
+      [anchorX - width / 2, playerScreen.bottom + 8],
+    );
+    const candidates = rawCandidates
+      .map(([left, top]) => makeCandidate(left, top))
+      .filter((candidate, candidateIndex, all) => all.findIndex((other) => other.left === candidate.left && other.top === candidate.top) === candidateIndex);
+    const score = (candidate) => obstacles.reduce((total, obstacle) => total + rectOverlapArea(candidate, obstacle, 4), 0);
+    let candidate = candidates.find((item) => score(item) === 0);
+    if (!candidate && index > 0) {
+      card.hidden = true;
+      return;
+    }
+    if (!candidate) candidate = [...candidates].sort((a, b) => score(a) - score(b))[0];
+    card.style.transform = `translate3d(${Math.round(candidate.left)}px, ${Math.round(candidate.top)}px, 0)`;
+    placed.push(candidate);
+    displayed.push(entry);
+  });
+  proximityLayer.dataset.count = String(displayed.length);
+  proximityLayer.dataset.ids = displayed.map((entry) => entry.id).join(',');
+  proximityLayer.setAttribute('aria-label', `Nearby: ${displayed.map((entry) => `${entry.title}, ${entry.stateLabel}, ${entry.hint}`).join('; ')}`);
+  return displayed;
+}
+
 function updatePlayer(deltaMs = FIXED_STEP_MS) {
   const inputKeys = [...keys];
   const viewportSize = getViewportSize();
   if (!state.engine) return;
   stepTerrariumEngine(state.engine, {
     keys: inputKeys,
-    moveVector: state.dossierState === 'expanded' ? { x: 0, y: 0 } : inputState.moveVector,
-    cameraOffset: state.dossierState === 'expanded' ? { x: 0, y: 0 } : inputState.cameraFreeLook,
+    moveVector: state.dossierState === 'expanded' || state.guideOpen ? { x: 0, y: 0 } : inputState.moveVector,
+    cameraOffset: state.dossierState === 'expanded' || state.guideOpen ? { x: 0, y: 0 } : inputState.cameraFreeLook,
     deltaMs,
     viewportSize,
   });
@@ -707,6 +1016,7 @@ function draw(frameAt = performance.now()) {
   world.agents.forEach(drawAgent);
   drawPlayer();
   ctx.restore();
+  renderProximityLayer();
   drawFishbowlGlass(rect);
   state.tick += 1;
   requestAnimationFrame(draw);
@@ -1934,7 +2244,7 @@ function drawFishbowlGlass(rect) {
 }
 
 function selectAt(clientX, clientY) {
-  if (!state.world || state.dossierState === 'expanded') return null;
+  if (!state.world || state.dossierState === 'expanded' || state.guideOpen) return null;
   const rect = canvas.getBoundingClientRect();
   const zoom = inputState.worldZoom || 1;
   const wx = (clientX - rect.left) / zoom + state.camera.x;
@@ -2047,7 +2357,7 @@ function setDossierState(nextState) {
 }
 
 function claimPointerRole(event) {
-  if (state.dossierState === 'expanded') return null;
+  if (state.dossierState === 'expanded' || state.guideOpen) return null;
   const rect = playfield.getBoundingClientRect();
   const localX = event.clientX - rect.left;
   const isMouse = event.pointerType === 'mouse';
@@ -2140,29 +2450,39 @@ function handlePointerEnd(event) {
 
 window.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
-  if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'w', 'a', 's', 'd'].includes(key) && state.dossierState !== 'expanded') {
+  if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'w', 'a', 's', 'd'].includes(key) && state.dossierState !== 'expanded' && !state.guideOpen) {
     keys.add(key);
     event.preventDefault();
   }
-  if (key === 'e') {
+  if (key === 'e' && !state.guideOpen) {
     performAction('collectProof');
     event.preventDefault();
   }
-  if (key === 'f') {
+  if (key === 'f' && !state.guideOpen) {
     performAction('followAgent');
     event.preventDefault();
   }
-  if (key === ' ') {
+  if (key === ' ' && !state.guideOpen) {
     performAction('inspectNearest');
     event.preventDefault();
   }
   if (key === 'g') {
-    performAction('openOwnerGuide');
+    if (state.guideOpen) closeGuideEncounter();
+    else performAction('openOwnerGuide');
+    event.preventDefault();
+  }
+  if (key === 'escape' && state.guideOpen) {
+    closeGuideEncounter();
     event.preventDefault();
   }
 });
 window.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase()));
-window.addEventListener('resize', resizeCanvas);
+syncVisualViewportHeight();
+window.addEventListener('resize', syncVisualViewportHeight);
+if (visualViewport) {
+  visualViewport.addEventListener('resize', syncVisualViewportHeight);
+  visualViewport.addEventListener('scroll', syncVisualViewportHeight);
+}
 playfield.addEventListener('pointerdown', handlePointerDown);
 playfield.addEventListener('pointermove', handlePointerMove);
 playfield.addEventListener('pointerup', handlePointerEnd);
@@ -2172,7 +2492,10 @@ playfield.addEventListener('contextmenu', (event) => event.preventDefault());
 playfield.addEventListener('dragstart', (event) => event.preventDefault());
 window.addEventListener('blur', () => resetAllInput('blur'));
 window.addEventListener('pagehide', () => resetAllInput('pagehide'));
-window.addEventListener('orientationchange', () => resetAllInput('orientationchange'));
+window.addEventListener('orientationchange', () => {
+  resetAllInput('orientationchange');
+  window.requestAnimationFrame(syncVisualViewportHeight);
+});
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') resetAllInput('visibilitychange');
 });
@@ -2200,7 +2523,8 @@ function performAction(action) {
   state.selected = state.world.entities.find((entity) => entity.id === state.engine.selectedId) || state.selected;
   updateInspector();
   updateGameHud();
-  showActionToast(result);
+  if (action === 'openOwnerGuide' && result.ok) openGuideEncounter(result.ownerGuide);
+  else showActionToast(result);
   return result;
 }
 
@@ -2241,6 +2565,13 @@ verbGather.addEventListener('click', () => performAction('collectProof'));
 verbClear.addEventListener('click', () => performAction('clearFog'));
 verbGate.addEventListener('click', () => performAction('unlockGate'));
 if (verbGuide) verbGuide.addEventListener('click', () => performAction('openOwnerGuide'));
+if (guideBack) guideBack.addEventListener('click', () => {
+  state.guidePage = Math.max(0, state.guidePage - 1);
+  renderGuideEncounter();
+});
+if (guideNotes) guideNotes.addEventListener('click', () => setGuideMode(state.guideMode === 'story' ? 'notes' : 'story'));
+if (guideNext) guideNext.addEventListener('click', advanceGuideEncounter);
+if (guideClose) guideClose.addEventListener('click', () => closeGuideEncounter());
 if (controlSideToggle) controlSideToggle.addEventListener('click', () => {
   setMovementSide(inputState.movementSide === 'left' ? 'right' : 'left');
 });
@@ -2373,6 +2704,9 @@ const runtimeApi = {
     worldZoom: inputState.worldZoom,
     movementSide: inputState.movementSide,
     dossierState: state.dossierState,
+    guideOpen: state.guideOpen,
+    guideMode: state.guideMode,
+    guidePage: state.guidePage,
     joystickActive: joystickZone.dataset.active === 'true',
     lastReset: playfield.dataset.inputReset || '',
   }),
@@ -2395,6 +2729,7 @@ const runtimeApi = {
   getWorldGeometry: () => getWorldGeometry(),
   getGameHud: () => (state.engine ? getGameHud(state.engine) : null),
   getRenderScene: () => (state.engine ? getRenderScene(state.engine) : null),
+  getProximityInfo: (options = {}) => (state.engine ? getProximityInfo(state.engine, options) : []),
   snapshotEngine: () => (state.engine ? snapshotEngine(state.engine) : null),
   getEventQueue: () => (state.engine ? state.engine.eventQueue.map((event) => ({ ...event })) : []),
   refreshWorld: (options = {}) => refreshWorldSnapshot(options),
