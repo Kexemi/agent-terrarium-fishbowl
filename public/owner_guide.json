@@ -1,0 +1,47 @@
+{
+  "id": "owner-ops-shrine",
+  "title": "Owner Ops Shrine",
+  "visible_as": "owner_guide",
+  "version": "0.1.0",
+  "summary": "How to run AI-OS from inside the game: what to say, ignore, approve, and how outcomes show up.",
+  "say": [
+    "Plain intent: what you want done or decided — not command lists.",
+    "Hard gates only: one short APPROVE … line when spend/send/deploy/delete/public tunnel is real.",
+    "Corrections: “still not a game,” “I have no link,” “this still feels like a dashboard.”",
+    "Outcomes language: “open the link,” “show proof,” “what needs me?”"
+  ],
+  "ignore": [
+    "Process IDs, loop heartbeats, and [SILENT] cron noise.",
+    "Green technical PASS without a phone-openable artifact or screenshot.",
+    "Raw vault paths as the primary handoff when you are on phone.",
+    "Asking you to run scripts the agent can run itself."
+  ],
+  "approve": [
+    "Credentials / API keys / auth login.",
+    "Spend, live trades, paid generation beyond agreed caps.",
+    "External send, publish, deploy, push/merge, public tunnels.",
+    "Deletes and permanent theme/canon changes.",
+    "Curated vault writes outside Inbox / Logs / Social Archives."
+  ],
+  "outcomes": [
+    "Quest banner + game message = current objective and last consequence.",
+    "Proof meter rises when you gather receipt lights (not when a model claims PASS).",
+    "Follow agent (F) mirrors a real worker; Gate check never auto-unlocks hard gates.",
+    "Owner Cockpit / spectator: Start here → Now → Timeline → Proof → Gates.",
+    "If autonomy is blind: demand the cockpit link before more loop work."
+  ],
+  "first_30_seconds": [
+    "Move with pad/WASD through the working room.",
+    "Tap Owner guide (or press G near the shrine).",
+    "Follow an agent, gather one proof light, gate-check a locked door.",
+    "Only approve if a real hard gate appears with a copyable APPROVE line."
+  ],
+  "source_path": "Repos/Agent-Terrarium-Prototype/public/owner_guide.json",
+  "timestamp": "2026-07-08T23:40:00Z",
+  "proof_status": "owner_guide_v0_in_game",
+  "next_event": "owner_guide_opened",
+  "x": 8,
+  "y": 14,
+  "w": 5,
+  "h": 4
+}

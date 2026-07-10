@@ -1,0 +1,1800 @@
+{
+  "agents": [
+    {
+      "body": "Absorb owner corrections and convert them into architecture rules, tests, and receipts.",
+      "id": "architecture-constitution",
+      "mood": "blue",
+      "next_event": "architecture_rule_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "architecture-constitution",
+      "state": "listening_for_event",
+      "title": "Architecture / Constitution Loop",
+      "x": 14,
+      "y": 8
+    },
+    {
+      "body": "Maintain Agent Terrarium as a live playable working-space viewport into AI-OS, not a decorative game-about-AI-OS or dashboard skin.",
+      "id": "working-space-viewport",
+      "mood": "red",
+      "next_event": "manual_world_compile",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\driver_result.json",
+        "status": "route_terminal_source",
+        "timestamp": "2026-07-08T06:34:56Z"
+      },
+      "role": "working-space-viewport",
+      "state": "route_child_timeout",
+      "title": "Working-Space Viewport Loop",
+      "x": 27,
+      "y": 10
+    },
+    {
+      "body": "Maintain the whole-game plan and convert owner corrections, red-team failures, and definition-of-good changes into the next concrete game-building events.",
+      "id": "game-plan-director",
+      "mood": "blue",
+      "next_event": "game_plan_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "game-plan-director",
+      "state": "listening_for_event",
+      "title": "Full Game Plan Director Loop",
+      "x": 10,
+      "y": 12
+    },
+    {
+      "body": "Turn AI-OS ground truth sources into game world state: organs, agents, quests, resources, fog, gates, receipts.",
+      "id": "source-to-world",
+      "mood": "blue",
+      "next_event": "world_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "source-to-world",
+      "state": "listening_for_event",
+      "title": "Source → world.json Compiler Loop",
+      "x": 27,
+      "y": 18
+    },
+    {
+      "body": "Evolve and enforce the living rubric for when Agent Terrarium is actually good, without lowering standards to match the current implementation.",
+      "id": "definition-of-good-oracle",
+      "mood": "blue",
+      "next_event": "quality_gate_failed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "definition-of-good-oracle",
+      "state": "listening_for_event",
+      "title": "Definition Of Good Oracle Loop",
+      "x": 30,
+      "y": 17
+    },
+    {
+      "body": "Render world state as an actual 2D pixel-art working-space viewport: tilemap, sprites, camera, player verbs, animation from state.",
+      "id": "world-to-game",
+      "mood": "gold",
+      "next_event": "screenshot_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "world-to-game",
+      "state": "routed_for_event",
+      "title": "world.json → Pixel Game Runtime Loop",
+      "x": 14,
+      "y": 21
+    },
+    {
+      "body": "Playtest as the owner before the owner sees the artifact: attack whether it feels like a viewport into the working space, plus game feel, proof wiring, mobile reality, dashboard slop, autonomy, and hard gates.",
+      "id": "owner-proxy-red-team",
+      "mood": "gold",
+      "next_event": "red_team_failed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "owner-proxy-red-team",
+      "state": "routed_for_event",
+      "title": "Owner-Proxy Red Team / Playtest Loop",
+      "x": 31,
+      "y": 10
+    },
+    {
+      "body": "React to tests, screenshots, layout probes, critic findings, and proof failures; repair the game until receipts support claims.",
+      "id": "proof-playtest",
+      "mood": "blue",
+      "next_event": "test_passed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "proof-playtest",
+      "state": "listening_for_event",
+      "title": "Proof / Playtest Loop",
+      "x": 18,
+      "y": 19
+    },
+    {
+      "body": "Choose the next best event/action from current state, rubric failures, proof results, and hard-gate boundaries.",
+      "id": "optimal-action-policy",
+      "mood": "blue",
+      "next_event": "manual_world_compile",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "optimal-action-policy",
+      "state": "listening_for_event",
+      "title": "Optimal Action Policy Loop",
+      "x": 10,
+      "y": 24
+    },
+    {
+      "body": "Track true hard gates and only surface owner decisions when a gate is real: public deploy, spend, secrets, sends, deletes, persistent services.",
+      "id": "owner-gate-router",
+      "mood": "blue",
+      "next_event": "gate_approved",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "loop_config_source",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "role": "owner-gate-router",
+      "state": "listening_for_event",
+      "title": "Owner Gate Router Loop",
+      "x": 35,
+      "y": 16
+    }
+  ],
+  "fishbowl": {
+    "freshness": {
+      "label": "Fresh local snapshot",
+      "latest_at": "2026-07-10T00:57:46.882525+00:00"
+    },
+    "health": {
+      "alerts": [],
+      "label": "Working · 9 service warnings",
+      "ok": true,
+      "service_warnings": 9,
+      "tone": "watch"
+    },
+    "inbox": {
+      "actions": {
+        "curated_project_proposal": 144,
+        "knowledge_candidate": 1,
+        "no_ingest_archive_candidate": 5,
+        "no_ingest_low_signal": 6,
+        "no_ingest_runtime_log": 102,
+        "no_ingest_superseded_artifact": 1,
+        "source_research_candidate": 125,
+        "workflow_queue_candidate": 7
+      },
+      "total": 391
+    },
+    "owner": {
+      "gate_count": 8,
+      "label": "Nothing needs you",
+      "needed": false
+    },
+    "proof": {
+      "cbr_r": 0.478,
+      "mes_r_status": "INVALID",
+      "token_value": 0.608,
+      "tqs_r_status": "PROXY"
+    },
+    "queue": {
+      "available": true,
+      "claimed": 0,
+      "failed": 0,
+      "oldest_queued_at": null,
+      "pressure": "IDLE_CLEAR",
+      "queued": 0,
+      "receipted": 6718
+    },
+    "schema": "agent_terrarium_fishbowl.v1",
+    "truth_boundary": "Local read-only snapshot; no work, gate, spend, send, deploy, or credential mutation from this game slice.",
+    "work": {
+      "label": "Proof lane: draining + proving",
+      "last_tick": {
+        "at": "2026-07-10T00:57:46.651022+00:00",
+        "mode": "PARALLEL",
+        "steps": 13,
+        "steps_ok": 11,
+        "wall_s": 14.216
+      },
+      "status": "ARMED_LOCAL_DRAIN_AND_PROVE"
+    }
+  },
+  "fog": [
+    {
+      "h": 3,
+      "id": "red-team-pending-fog",
+      "next_event": "red_team_review_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a257f76093a4a59985cb9b7443c1063fa01c26dd5f75e5de5cea41995813e368",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\WORKING-SPACE-VIEWPORT-CONTRACT.md",
+        "status": "red_team_pending",
+        "timestamp": "2026-07-07T22:46:30Z"
+      },
+      "reason": "Live world compiled, but owner-proxy red-team and screenshot proof have not accepted this slice yet.",
+      "w": 5,
+      "x": 28,
+      "y": 14
+    }
+  ],
+  "gates": [
+    {
+      "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+      "id": "no-slow-time-cron-work-loops",
+      "next_event": "manual_world_compile",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "hard_gate_preserved",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "status": "locked",
+      "title": "No Slow Time-Cron Work Loops",
+      "x": 11,
+      "y": 26
+    },
+    {
+      "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+      "id": "no-external-deploy",
+      "next_event": "gate_required",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "hard_gate_preserved",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "status": "locked",
+      "title": "No External Deploy Without Approval",
+      "x": 18,
+      "y": 27
+    },
+    {
+      "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+      "id": "no-curated-vault-writes",
+      "next_event": "gate_required",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "hard_gate_preserved",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "status": "locked",
+      "title": "No Curated Knowledge/Projects Writes",
+      "x": 25,
+      "y": 27
+    },
+    {
+      "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+      "id": "no-spend-or-credentials",
+      "next_event": "gate_required",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "hard_gate_preserved",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "status": "locked",
+      "title": "No Spend / Secrets / Auth Changes",
+      "x": 32,
+      "y": 27
+    }
+  ],
+  "hard_gates_preserved": [
+    "new slow time-cron work loops",
+    "external sends/posts/customer contact/public deploys beyond an approved temporary link",
+    "spend/trades/credentials/secrets/auth changes",
+    "destructive deletes/large moves",
+    "curated Knowledge/Projects vault writes",
+    "persistent/autostart services"
+  ],
+  "meta": {
+    "created_at": "2026-07-07T22:20:32Z",
+    "event_id": "dfe49443e7add4e1",
+    "event_type": "workspace_viewport_requested",
+    "generated_from": "source_paths_and_timestamps",
+    "source_mode": "LIVE_LOCAL_SNAPSHOT",
+    "title": "Agent Terrarium — Cozy AI-OS Fishbowl",
+    "warning": "Local live snapshot only; no external deploy, spend, sends, auth changes, deletes, or curated vault writes were performed."
+  },
+  "organs": [
+    {
+      "body": "The sorting shed holds 390 captured signals until review turns them into safe work.",
+      "h": 5,
+      "id": "inbox-ingestion-gate",
+      "kind": "intake",
+      "next_event": "manual_world_compile",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "2e79f4222e72fd7a100031241d0d7ea824b3eed3ae7f9a21d66c38df17d5b472",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\Inbox-Ingestion-Gate\\queue-latest.json",
+        "status": "source_linked",
+        "timestamp": "2026-07-09T22:27:21Z"
+      },
+      "state": "ore_visible",
+      "title": "Refinery Sorting Shed",
+      "w": 5,
+      "x": 5,
+      "y": 7
+    },
+    {
+      "body": "The hearth shows whether the homestead is calm, watchful, or needs attention; proof remains one tap away.",
+      "h": 4,
+      "id": "aios-service-status",
+      "kind": "service",
+      "next_event": "source_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
+        "status": "source_linked",
+        "timestamp": "2026-07-10T00:52:53Z"
+      },
+      "state": "status_visible",
+      "title": "Hearth House",
+      "w": 6,
+      "x": 16,
+      "y": 5
+    },
+    {
+      "body": "Crates are work waiting to be consumed; the source workflow has 3 open items.",
+      "h": 4,
+      "id": "workflow-queue",
+      "kind": "queue",
+      "next_event": "queue_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "2aae957b00982a3350ce19987d589f62d73f89efebee2beb804fd22a2810048f",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Workflow-Queue.md",
+        "status": "source_linked",
+        "timestamp": "2026-07-02T18:21:38Z"
+      },
+      "state": "open_work_visible",
+      "title": "Work Granary",
+      "w": 5,
+      "x": 28,
+      "y": 7
+    },
+    {
+      "body": "Source-backed loops turn the waterwheel: visible motion means a named worker has real work and a receipt trail.",
+      "h": 5,
+      "id": "agent-terrarium",
+      "kind": "event_fabric",
+      "next_event": "workspace_viewport_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "source_linked",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "state": "multi_loop_awake",
+      "title": "Waterwheel Workshop",
+      "w": 6,
+      "x": 24,
+      "y": 19
+    },
+    {
+      "body": "The lookout keeps the whole working homestead visible as a place, not a disguised control panel.",
+      "h": 4,
+      "id": "working-space-viewport",
+      "kind": "viewport",
+      "next_event": "viewport_artifact_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a257f76093a4a59985cb9b7443c1063fa01c26dd5f75e5de5cea41995813e368",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\WORKING-SPACE-VIEWPORT-CONTRACT.md",
+        "status": "source_linked",
+        "timestamp": "2026-07-07T22:46:30Z"
+      },
+      "state": "product_law_active",
+      "title": "Lookout Library",
+      "w": 5,
+      "x": 12,
+      "y": 20
+    },
+    {
+      "body": "The stewardship charter keeps proof, owner gates, and no-fake-liveness law visible as fences and locked doors.",
+      "h": 4,
+      "id": "real-game-constitution",
+      "kind": "constitution",
+      "next_event": "definition_of_good_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "e778b51e3c167b904916119906e1e814007ee3844ecf4a139cb34dba668deea6",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\REAL-GAME-CONSTITUTION.md",
+        "status": "source_linked",
+        "timestamp": "2026-07-07T22:17:38Z"
+      },
+      "state": "hard_vetoes_active",
+      "title": "Steward's Hall",
+      "w": 6,
+      "x": 33,
+      "y": 23
+    },
+    {
+      "body": "The latest workspace_viewport_requested event flows downstream to the workers that know how to use it.",
+      "h": 5,
+      "id": "event-bus",
+      "kind": "event_bus",
+      "next_event": "optimal_action_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "90ee68a9d6ac438d6186a7247b70e1e23247c4358150b44e4f40d29f905c41ee",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+        "status": "source_linked",
+        "timestamp": "2026-07-08T20:24:18Z"
+      },
+      "state": "events_feed_world",
+      "title": "Mill Stream",
+      "w": 5,
+      "x": 7,
+      "y": 22
+    },
+    {
+      "body": "Tools at hand are visible without making the owner memorize machinery: enabled=21, paused=6.",
+      "h": 4,
+      "id": "capability-map",
+      "kind": "capability",
+      "next_event": "red_team_review_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
+        "status": "source_linked",
+        "timestamp": "2026-07-09T23:24:05Z"
+      },
+      "state": "capabilities_visible",
+      "title": "Tool Shed",
+      "w": 6,
+      "x": 34,
+      "y": 12
+    },
+    {
+      "body": "Fruit appears only when competence, consumption, taste, or token-value evidence becomes source-backed; proxy fruit stays visibly unripe.",
+      "h": 4,
+      "id": "proof-orchard",
+      "kind": "proof",
+      "next_event": "scoreboard_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
+        "status": "source_linked",
+        "timestamp": "2026-07-10T00:57:46Z"
+      },
+      "state": "measured_growth_visible",
+      "title": "Proof Orchard",
+      "w": 5,
+      "x": 19,
+      "y": 22
+    }
+  ],
+  "quests": [
+    {
+      "body": "Compile live source roots into a playable viewport with source-path proof for selected entities.",
+      "event_id": "dfe49443e7add4e1",
+      "id": "slice-a-working-room-window",
+      "next_event": "manual_game_build",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "route_event_source",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "state": "truth_compiler_now_available",
+      "title": "Slice A — Working Room Window"
+    },
+    {
+      "body": "After the runtime loads this world.json, red team must attack dashboard slop, fake liveness, and proof wiring.",
+      "event_id": "dfe49443e7add4e1",
+      "id": "owner-proxy-red-team-needed",
+      "next_event": "red_team_review_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "status": "red_team_pending",
+        "timestamp": "2026-07-08T06:04:55Z"
+      },
+      "state": "pending_playtest",
+      "title": "Owner-Proxy Red Team Needed"
+    }
+  ],
+  "receipts": [
+    {
+      "id": "route-00043-dfe49443e7add4e1",
+      "next_event": "viewport_artifact_changed",
+      "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\driver_result.json",
+        "status": "route_state_source",
+        "timestamp": "2026-07-08T06:34:56Z"
+      },
+      "status": "route_child_timeout",
+      "title": "Current route receipt trail"
+    },
+    {
+      "id": "event-loop-fabric-latest-recap",
+      "next_event": "optimal_action_requested",
+      "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\LATEST_RECAP.md",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "bbb927997e90ffd5065c69e9573ff5ee189316ffc1a1b4946536ffbab8093e32",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\LATEST_RECAP.md",
+        "status": "receipt_source",
+        "timestamp": "2026-07-08T20:24:19Z"
+      },
+      "status": "fabric_receipt_exists",
+      "title": "Event Fabric Latest Recap"
+    }
+  ],
+  "resources": [
+    {
+      "amount": 19,
+      "body": "Each light point corresponds to a file with path, timestamp, size, and SHA-256.",
+      "id": "source-ledger-light",
+      "next_event": "viewport_artifact_changed",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "source_ledger_verified",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "title": "Source Ledger Light",
+      "x": 26,
+      "y": 18
+    },
+    {
+      "amount": 1,
+      "body": "North star stays visible without external contact, spend, or public promises from this loop.",
+      "id": "family-security-ember",
+      "next_event": "optimal_action_requested",
+      "proof": {
+        "event_id": "dfe49443e7add4e1",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "status": "north_star_boundary",
+        "timestamp": "2026-07-07T22:18:19Z"
+      },
+      "title": "Family Security Ember",
+      "x": 36,
+      "y": 24
+    }
+  ],
+  "source_ledger": {
+    "requirements": {
+      "deterministic_inputs": "source paths + mtimes + hashes + event payload",
+      "no_fake_liveness": true,
+      "visible_entity_requires": [
+        "source_path",
+        "mtime_iso",
+        "sha256",
+        "proof.status",
+        "next_event"
+      ]
+    },
+    "source_count": 19,
+    "sources": [
+      {
+        "id": "aios-service-status",
+        "mtime_iso": "2026-07-10T00:52:53Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
+        "role": "service_status",
+        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
+        "size_bytes": 10069
+      },
+      {
+        "id": "capability-map",
+        "mtime_iso": "2026-07-09T23:24:05Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
+        "role": "capability_map",
+        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
+        "size_bytes": 3247
+      },
+      {
+        "id": "event-bus",
+        "mtime_iso": "2026-07-08T20:24:18Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+        "role": "event_bus",
+        "sha256": "90ee68a9d6ac438d6186a7247b70e1e23247c4358150b44e4f40d29f905c41ee",
+        "size_bytes": 87386
+      },
+      {
+        "id": "event-loop-config",
+        "mtime_iso": "2026-07-07T22:18:19Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "role": "event_loop_config",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "size_bytes": 14312
+      },
+      {
+        "id": "inbox-ingestion-gate",
+        "mtime_iso": "2026-07-09T22:27:21Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\Inbox-Ingestion-Gate\\queue-latest.json",
+        "role": "inbox_ingestion_gate",
+        "sha256": "2e79f4222e72fd7a100031241d0d7ea824b3eed3ae7f9a21d66c38df17d5b472",
+        "size_bytes": 352415
+      },
+      {
+        "id": "meta-health",
+        "mtime_iso": "2026-07-10T00:57:46Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\health-latest.json",
+        "role": "meta_health",
+        "sha256": "81c021f0390af6f31e185347dc58ca0ed2a847400ac221ec25f2fc0128cae67f",
+        "size_bytes": 153
+      },
+      {
+        "id": "meta-launch",
+        "mtime_iso": "2026-07-09T22:30:28Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\GO_ALL_OUT_LAUNCH.json",
+        "role": "meta_launch_contract",
+        "sha256": "b31600c490cb460e68f45e2289439af9dcf08a54d015259ccdf80fc42057b79e",
+        "size_bytes": 3055
+      },
+      {
+        "id": "meta-prime-queue",
+        "mtime_iso": "2026-07-10T00:57:45Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\prime-queue.sqlite",
+        "role": "meta_queue",
+        "sha256": "a630a4d5eec1aa435aa2e0882df22d876d3dd9ae7d14b4219b3435f4ca4cd15a",
+        "size_bytes": 1970176
+      },
+      {
+        "id": "meta-scoreboard",
+        "mtime_iso": "2026-07-10T00:57:46Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
+        "role": "meta_scoreboard",
+        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
+        "size_bytes": 5992
+      },
+      {
+        "id": "owner-guide",
+        "mtime_iso": "2026-07-08T23:35:36Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\public\\owner_guide.json",
+        "role": "owner_guide",
+        "sha256": "1b08cf791389de949b407cffc6f9e03491cd965ba1273ced7fb4ea8d185f0f23",
+        "size_bytes": 2168
+      },
+      {
+        "id": "owner-proxy-scorecard",
+        "mtime_iso": "2026-07-08T19:45:45Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\owner-proxy-red-team\\route-00072-d50151dc6cd170d8\\owner_proxy_scorecard.json",
+        "role": "owner_proxy_scorecard",
+        "sha256": "eb4e487750bb2973faa2d81b449df863a3d692f5a6e023d7326ee88f561b0725",
+        "size_bytes": 13798
+      },
+      {
+        "id": "real-game-constitution",
+        "mtime_iso": "2026-07-07T22:17:38Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\REAL-GAME-CONSTITUTION.md",
+        "role": "real_game_constitution",
+        "sha256": "e778b51e3c167b904916119906e1e814007ee3844ecf4a139cb34dba668deea6",
+        "size_bytes": 6799
+      },
+      {
+        "id": "route-driver-result",
+        "mtime_iso": "2026-07-08T06:34:56Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\driver_result.json",
+        "role": "route_driver_result",
+        "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+        "size_bytes": 552
+      },
+      {
+        "id": "route-event",
+        "mtime_iso": "2026-07-08T06:04:55Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "role": "route_event",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "size_bytes": 391
+      },
+      {
+        "id": "route-goal",
+        "mtime_iso": "2026-07-08T06:04:55Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\goal_prompt.md",
+        "role": "route_goal_prompt",
+        "sha256": "f8e8a4204a9abb2d60115d0c346c6393b2f099b6a4aafee2f71b65ec9d87c7c5",
+        "size_bytes": 4250
+      },
+      {
+        "id": "route-loop",
+        "mtime_iso": "2026-07-08T06:04:55Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\loop.json",
+        "role": "route_loop_config",
+        "sha256": "6e98fca3d56ca7e202fba98a723388529a5c8e571771c9e4b1d71e1169ae4ddc",
+        "size_bytes": 1591
+      },
+      {
+        "id": "vault-state",
+        "mtime_iso": "2026-07-09T23:24:05Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Vault-State.md",
+        "role": "vault_state",
+        "sha256": "ce68a7d260d1ecaec5a7d74375848adf200f3460610ac5d1778d7af505692b7b",
+        "size_bytes": 68405
+      },
+      {
+        "id": "workflow-queue",
+        "mtime_iso": "2026-07-02T18:21:38Z",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Workflow-Queue.md",
+        "role": "workflow_queue",
+        "sha256": "2aae957b00982a3350ce19987d589f62d73f89efebee2beb804fd22a2810048f",
+        "size_bytes": 76814
+      },
+      {
+        "id": "working-space-contract",
+        "mtime_iso": "2026-07-07T22:46:30Z",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\WORKING-SPACE-VIEWPORT-CONTRACT.md",
+        "role": "viewport_contract",
+        "sha256": "a257f76093a4a59985cb9b7443c1063fa01c26dd5f75e5de5cea41995813e368",
+        "size_bytes": 3817
+      }
+    ]
+  },
+  "tilemap": {
+    "biome": "cozy_homestead_fishbowl",
+    "height": 30,
+    "tile_size": 32,
+    "weather": "gentle_morning",
+    "width": 42
+  },
+  "viewport": {
+    "active_loops": [],
+    "artifacts": [
+      {
+        "id": "data-world-json",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\data\\world.json",
+        "status": "compiler_output"
+      },
+      {
+        "id": "public-world-json",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\public\\world.json",
+        "status": "runtime_input"
+      }
+    ],
+    "definition": "working_space_viewport",
+    "event_bus": {
+      "current_event_id": "dfe49443e7add4e1",
+      "current_event_type": "workspace_viewport_requested",
+      "event_count": 80,
+      "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+      "timestamp": "2026-07-08T20:24:18Z"
+    },
+    "gates": [
+      {
+        "id": "no-slow-time-cron-work-loops",
+        "status": "locked",
+        "title": "No Slow Time-Cron Work Loops"
+      },
+      {
+        "id": "no-external-deploy",
+        "status": "locked",
+        "title": "No External Deploy Without Approval"
+      },
+      {
+        "id": "no-curated-vault-writes",
+        "status": "locked",
+        "title": "No Curated Knowledge/Projects Writes"
+      },
+      {
+        "id": "no-spend-or-credentials",
+        "status": "locked",
+        "title": "No Spend / Secrets / Auth Changes"
+      }
+    ],
+    "loop_architecture": {
+      "contract": "problem-path-specific loops over one shared event bus with per-loop receipt trails and downstream event suggestions",
+      "current_event_id": "dfe49443e7add4e1",
+      "current_event_type": "workspace_viewport_requested",
+      "fabric": "multi-loop event fabric",
+      "invalid_driver_shape": "slow scheduled work loop or timer-driven worker as the Terrarium work engine",
+      "name": "event-driven loops"
+    },
+    "objects": [
+      {
+        "entity_id": "vault",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "source_changed",
+        "proof_status": "source_root_exists",
+        "sha256": "903ed0e3600a4d2cc8ef51d8e6201ee28483c1913ef9c5887a68cfb5bd56bba8",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault",
+        "state": "exists",
+        "timestamp": "2026-07-08T08:16:26Z",
+        "title": "vault_root",
+        "visible_as": "source_root",
+        "x": 5,
+        "y": 7
+      },
+      {
+        "entity_id": "repo",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "source_changed",
+        "proof_status": "source_root_exists",
+        "sha256": "a78d13eb554e06123f7179e2d62d1f1569e247ffa9ff786c306500baba09be4d",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype",
+        "state": "exists",
+        "timestamp": "2026-07-10T00:09:20Z",
+        "title": "repo_root",
+        "visible_as": "source_root",
+        "x": 16,
+        "y": 5
+      },
+      {
+        "entity_id": "source-root-event-bus",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "source_changed",
+        "proof_status": "source_root_exists",
+        "sha256": "b17ae619a011c288765ad724f6b1f8b170ba66b9b2e5ad9f725d60b7b98e9129",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+        "state": "exists",
+        "timestamp": "2026-07-08T20:24:18Z",
+        "title": "event_bus",
+        "visible_as": "source_root",
+        "x": 28,
+        "y": 7
+      },
+      {
+        "entity_id": "route-dir",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "source_changed",
+        "proof_status": "source_root_exists",
+        "sha256": "9f1f9e63938210b4a3bbf3a06a13c51d9a338bd35d3c758cc7a4dbb0370fee8a",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1",
+        "state": "exists",
+        "timestamp": "2026-07-08T06:34:56Z",
+        "title": "route_receipt_dir",
+        "visible_as": "source_root",
+        "x": 24,
+        "y": 19
+      },
+      {
+        "body": "The sorting shed holds 390 captured signals until review turns them into safe work.",
+        "entity_id": "inbox-ingestion-gate",
+        "h": 5,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "manual_world_compile",
+        "proof_status": "source_linked",
+        "sha256": "2e79f4222e72fd7a100031241d0d7ea824b3eed3ae7f9a21d66c38df17d5b472",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\Inbox-Ingestion-Gate\\queue-latest.json",
+        "state": "ore_visible",
+        "timestamp": "2026-07-09T22:27:21Z",
+        "title": "Refinery Sorting Shed",
+        "visible_as": "building",
+        "w": 5,
+        "x": 5,
+        "y": 7
+      },
+      {
+        "body": "The hearth shows whether the homestead is calm, watchful, or needs attention; proof remains one tap away.",
+        "entity_id": "aios-service-status",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "source_changed",
+        "proof_status": "source_linked",
+        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
+        "state": "status_visible",
+        "timestamp": "2026-07-10T00:52:53Z",
+        "title": "Hearth House",
+        "visible_as": "building",
+        "w": 6,
+        "x": 16,
+        "y": 5
+      },
+      {
+        "body": "Crates are work waiting to be consumed; the source workflow has 3 open items.",
+        "entity_id": "workflow-queue",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "queue_changed",
+        "proof_status": "source_linked",
+        "sha256": "2aae957b00982a3350ce19987d589f62d73f89efebee2beb804fd22a2810048f",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Workflow-Queue.md",
+        "state": "open_work_visible",
+        "timestamp": "2026-07-02T18:21:38Z",
+        "title": "Work Granary",
+        "visible_as": "building",
+        "w": 5,
+        "x": 28,
+        "y": 7
+      },
+      {
+        "body": "Source-backed loops turn the waterwheel: visible motion means a named worker has real work and a receipt trail.",
+        "entity_id": "agent-terrarium",
+        "h": 5,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "workspace_viewport_requested",
+        "proof_status": "source_linked",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "multi_loop_awake",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Waterwheel Workshop",
+        "visible_as": "building",
+        "w": 6,
+        "x": 24,
+        "y": 19
+      },
+      {
+        "body": "The lookout keeps the whole working homestead visible as a place, not a disguised control panel.",
+        "entity_id": "building-working-space-viewport",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "viewport_artifact_changed",
+        "proof_status": "source_linked",
+        "sha256": "a257f76093a4a59985cb9b7443c1063fa01c26dd5f75e5de5cea41995813e368",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\WORKING-SPACE-VIEWPORT-CONTRACT.md",
+        "state": "product_law_active",
+        "timestamp": "2026-07-07T22:46:30Z",
+        "title": "Lookout Library",
+        "visible_as": "building",
+        "w": 5,
+        "x": 12,
+        "y": 20
+      },
+      {
+        "body": "The stewardship charter keeps proof, owner gates, and no-fake-liveness law visible as fences and locked doors.",
+        "entity_id": "real-game-constitution",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "definition_of_good_changed",
+        "proof_status": "source_linked",
+        "sha256": "e778b51e3c167b904916119906e1e814007ee3844ecf4a139cb34dba668deea6",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\REAL-GAME-CONSTITUTION.md",
+        "state": "hard_vetoes_active",
+        "timestamp": "2026-07-07T22:17:38Z",
+        "title": "Steward's Hall",
+        "visible_as": "building",
+        "w": 6,
+        "x": 33,
+        "y": 23
+      },
+      {
+        "body": "The latest workspace_viewport_requested event flows downstream to the workers that know how to use it.",
+        "entity_id": "event-bus",
+        "h": 5,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "optimal_action_requested",
+        "proof_status": "source_linked",
+        "sha256": "90ee68a9d6ac438d6186a7247b70e1e23247c4358150b44e4f40d29f905c41ee",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+        "state": "events_feed_world",
+        "timestamp": "2026-07-08T20:24:18Z",
+        "title": "Mill Stream",
+        "visible_as": "building",
+        "w": 5,
+        "x": 7,
+        "y": 22
+      },
+      {
+        "body": "Tools at hand are visible without making the owner memorize machinery: enabled=21, paused=6.",
+        "entity_id": "capability-map",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "red_team_review_requested",
+        "proof_status": "source_linked",
+        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
+        "state": "capabilities_visible",
+        "timestamp": "2026-07-09T23:24:05Z",
+        "title": "Tool Shed",
+        "visible_as": "building",
+        "w": 6,
+        "x": 34,
+        "y": 12
+      },
+      {
+        "body": "Fruit appears only when competence, consumption, taste, or token-value evidence becomes source-backed; proxy fruit stays visibly unripe.",
+        "entity_id": "proof-orchard",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "scoreboard_changed",
+        "proof_status": "source_linked",
+        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
+        "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
+        "state": "measured_growth_visible",
+        "timestamp": "2026-07-10T00:57:46Z",
+        "title": "Proof Orchard",
+        "visible_as": "building",
+        "w": 5,
+        "x": 19,
+        "y": 22
+      },
+      {
+        "body": "Absorb owner corrections and convert them into architecture rules, tests, and receipts.",
+        "entity_id": "architecture-constitution",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "architecture_rule_changed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Architecture / Constitution Loop",
+        "visible_as": "agent_sprite",
+        "x": 14,
+        "y": 8
+      },
+      {
+        "body": "Maintain Agent Terrarium as a live playable working-space viewport into AI-OS, not a decorative game-about-AI-OS or dashboard skin.",
+        "entity_id": "working-space-viewport",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "manual_world_compile",
+        "proof_status": "route_terminal_source",
+        "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\driver_result.json",
+        "state": "route_child_timeout",
+        "timestamp": "2026-07-08T06:34:56Z",
+        "title": "Working-Space Viewport Loop",
+        "visible_as": "agent_sprite",
+        "x": 27,
+        "y": 10
+      },
+      {
+        "body": "Maintain the whole-game plan and convert owner corrections, red-team failures, and definition-of-good changes into the next concrete game-building events.",
+        "entity_id": "game-plan-director",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "game_plan_changed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Full Game Plan Director Loop",
+        "visible_as": "agent_sprite",
+        "x": 10,
+        "y": 12
+      },
+      {
+        "body": "Turn AI-OS ground truth sources into game world state: organs, agents, quests, resources, fog, gates, receipts.",
+        "entity_id": "source-to-world",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "world_changed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Source → world.json Compiler Loop",
+        "visible_as": "agent_sprite",
+        "x": 27,
+        "y": 18
+      },
+      {
+        "body": "Evolve and enforce the living rubric for when Agent Terrarium is actually good, without lowering standards to match the current implementation.",
+        "entity_id": "definition-of-good-oracle",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "quality_gate_failed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Definition Of Good Oracle Loop",
+        "visible_as": "agent_sprite",
+        "x": 30,
+        "y": 17
+      },
+      {
+        "body": "Render world state as an actual 2D pixel-art working-space viewport: tilemap, sprites, camera, player verbs, animation from state.",
+        "entity_id": "world-to-game",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "screenshot_changed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "routed_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "world.json → Pixel Game Runtime Loop",
+        "visible_as": "agent_sprite",
+        "x": 14,
+        "y": 21
+      },
+      {
+        "body": "Playtest as the owner before the owner sees the artifact: attack whether it feels like a viewport into the working space, plus game feel, proof wiring, mobile reality, dashboard slop, autonomy, and hard gates.",
+        "entity_id": "owner-proxy-red-team",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "red_team_failed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "routed_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Owner-Proxy Red Team / Playtest Loop",
+        "visible_as": "agent_sprite",
+        "x": 31,
+        "y": 10
+      },
+      {
+        "body": "React to tests, screenshots, layout probes, critic findings, and proof failures; repair the game until receipts support claims.",
+        "entity_id": "proof-playtest",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "test_passed",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Proof / Playtest Loop",
+        "visible_as": "agent_sprite",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "body": "Choose the next best event/action from current state, rubric failures, proof results, and hard-gate boundaries.",
+        "entity_id": "optimal-action-policy",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "manual_world_compile",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Optimal Action Policy Loop",
+        "visible_as": "agent_sprite",
+        "x": 10,
+        "y": 24
+      },
+      {
+        "body": "Track true hard gates and only surface owner decisions when a gate is real: public deploy, spend, secrets, sends, deletes, persistent services.",
+        "entity_id": "owner-gate-router",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "gate_approved",
+        "proof_status": "loop_config_source",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "listening_for_event",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Owner Gate Router Loop",
+        "visible_as": "agent_sprite",
+        "x": 35,
+        "y": 16
+      },
+      {
+        "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+        "entity_id": "no-slow-time-cron-work-loops",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "manual_world_compile",
+        "proof_status": "hard_gate_preserved",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "locked",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "No Slow Time-Cron Work Loops",
+        "visible_as": "locked_door",
+        "x": 11,
+        "y": 26
+      },
+      {
+        "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+        "entity_id": "no-external-deploy",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "gate_required",
+        "proof_status": "hard_gate_preserved",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "locked",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "No External Deploy Without Approval",
+        "visible_as": "locked_door",
+        "x": 18,
+        "y": 27
+      },
+      {
+        "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+        "entity_id": "no-curated-vault-writes",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "gate_required",
+        "proof_status": "hard_gate_preserved",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "locked",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "No Curated Knowledge/Projects Writes",
+        "visible_as": "locked_door",
+        "x": 25,
+        "y": 27
+      },
+      {
+        "body": "Hard gate preserved by route contract; owner approval required before this side effect.",
+        "entity_id": "no-spend-or-credentials",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "gate_required",
+        "proof_status": "hard_gate_preserved",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "locked",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "No Spend / Secrets / Auth Changes",
+        "visible_as": "locked_door",
+        "x": 32,
+        "y": 27
+      },
+      {
+        "entity_id": "route-00043-dfe49443e7add4e1",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "viewport_artifact_changed",
+        "proof_status": "route_child_timeout",
+        "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1",
+        "state": "route_child_timeout",
+        "timestamp": "2026-07-08T06:34:56Z",
+        "title": "Current route receipt trail",
+        "visible_as": "receipt_light"
+      },
+      {
+        "entity_id": "event-loop-fabric-latest-recap",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "optimal_action_requested",
+        "proof_status": "fabric_receipt_exists",
+        "sha256": "bbb927997e90ffd5065c69e9573ff5ee189316ffc1a1b4946536ffbab8093e32",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\LATEST_RECAP.md",
+        "state": "fabric_receipt_exists",
+        "timestamp": "2026-07-08T20:24:19Z",
+        "title": "Event Fabric Latest Recap",
+        "visible_as": "receipt_light"
+      },
+      {
+        "body": "Compile live source roots into a playable viewport with source-path proof for selected entities.",
+        "entity_id": "slice-a-working-room-window",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "manual_game_build",
+        "proof_status": "truth_compiler_now_available",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "truth_compiler_now_available",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "Slice A — Working Room Window",
+        "visible_as": "quest"
+      },
+      {
+        "body": "After the runtime loads this world.json, red team must attack dashboard slop, fake liveness, and proof wiring.",
+        "entity_id": "owner-proxy-red-team-needed",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "red_team_review_requested",
+        "proof_status": "pending_playtest",
+        "sha256": "a29154dd17b4bb61367cb17b865e503cfd53f28c69b5d2666438735efeff4abd",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\event.json",
+        "state": "pending_playtest",
+        "timestamp": "2026-07-08T06:04:55Z",
+        "title": "Owner-Proxy Red Team Needed",
+        "visible_as": "quest"
+      },
+      {
+        "amount": 19,
+        "body": "Each light point corresponds to a file with path, timestamp, size, and SHA-256.",
+        "entity_id": "source-ledger-light",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "viewport_artifact_changed",
+        "proof_status": "source_ledger_verified",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "source_ledger_verified",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Source Ledger Light",
+        "visible_as": "resource_light",
+        "x": 26,
+        "y": 18
+      },
+      {
+        "amount": 1,
+        "body": "North star stays visible without external contact, spend, or public promises from this loop.",
+        "entity_id": "family-security-ember",
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "optimal_action_requested",
+        "proof_status": "north_star_boundary",
+        "sha256": "8782219d53530829782981b1f13a0ef23019a80d88be2b1ddd4071f7f8298661",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\configs\\terrarium-event-loops.json",
+        "state": "north_star_boundary",
+        "timestamp": "2026-07-07T22:18:19Z",
+        "title": "Family Security Ember",
+        "visible_as": "resource_light",
+        "x": 36,
+        "y": 24
+      },
+      {
+        "entity_id": "red-team-pending-fog",
+        "h": 3,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "red_team_review_requested",
+        "proof_status": "red_team_pending",
+        "reason": "Live world compiled, but owner-proxy red-team and screenshot proof have not accepted this slice yet.",
+        "sha256": "a257f76093a4a59985cb9b7443c1063fa01c26dd5f75e5de5cea41995813e368",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\docs\\WORKING-SPACE-VIEWPORT-CONTRACT.md",
+        "state": "red_team_pending",
+        "timestamp": "2026-07-07T22:46:30Z",
+        "title": "red-team-pending-fog",
+        "visible_as": "fog_alarm",
+        "w": 5,
+        "x": 28,
+        "y": 14
+      },
+      {
+        "body": "How to run AI-OS from inside the game: what to say, ignore, approve, and how outcomes show up.",
+        "entity_id": "owner-ops-shrine",
+        "h": 4,
+        "hash_scope": "source_content_sha256",
+        "inspectable_fields": [
+          "source_path",
+          "timestamp",
+          "state",
+          "proof_status",
+          "sha256",
+          "hash_scope",
+          "next_event"
+        ],
+        "next_event": "owner_guide_opened",
+        "owner_guide": {
+          "approve": [
+            "Credentials / API keys / auth login.",
+            "Spend, live trades, paid generation beyond agreed caps.",
+            "External send, publish, deploy, push/merge, public tunnels.",
+            "Deletes and permanent theme/canon changes.",
+            "Curated vault writes outside Inbox / Logs / Social Archives."
+          ],
+          "first_30_seconds": [
+            "Move with pad/WASD through the working room.",
+            "Tap Owner guide (or press G near the shrine).",
+            "Follow an agent, gather one proof light, gate-check a locked door.",
+            "Only approve if a real hard gate appears with a copyable APPROVE line."
+          ],
+          "ignore": [
+            "Process IDs, loop heartbeats, and [SILENT] cron noise.",
+            "Green technical PASS without a phone-openable artifact or screenshot.",
+            "Raw vault paths as the primary handoff when you are on phone.",
+            "Asking you to run scripts the agent can run itself."
+          ],
+          "outcomes": [
+            "Quest banner + game message = current objective and last consequence.",
+            "Proof meter rises when you gather receipt lights (not when a model claims PASS).",
+            "Follow agent (F) mirrors a real worker; Gate check never auto-unlocks hard gates.",
+            "Owner Cockpit / spectator: Start here → Now → Timeline → Proof → Gates.",
+            "If autonomy is blind: demand the cockpit link before more loop work."
+          ],
+          "say": [
+            "Plain intent: what you want done or decided — not command lists.",
+            "Hard gates only: one short APPROVE … line when spend/send/deploy/delete/public tunnel is real.",
+            "Corrections: “still not a game,” “I have no link,” “this still feels like a dashboard.”",
+            "Outcomes language: “open the link,” “show proof,” “what needs me?”"
+          ]
+        },
+        "proof_status": "owner_guide_v0_in_game",
+        "sha256": "1b08cf791389de949b407cffc6f9e03491cd965ba1273ced7fb4ea8d185f0f23",
+        "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\public\\owner_guide.json",
+        "state": "source_backed",
+        "timestamp": "2026-07-08T23:35:36Z",
+        "title": "Owner Ops Shrine",
+        "visible_as": "owner_guide",
+        "w": 5,
+        "x": 8,
+        "y": 14
+      }
+    ],
+    "receipts": [
+      {
+        "id": "route-00043-dfe49443e7add4e1",
+        "next_event": "viewport_artifact_changed",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1",
+        "proof": {
+          "event_id": "dfe49443e7add4e1",
+          "sha256": "f9a8fa1cf4f33362d0dba42107fb33664d0c8ccc5749133d134f6739425efe61",
+          "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1\\driver_result.json",
+          "status": "route_state_source",
+          "timestamp": "2026-07-08T06:34:56Z"
+        },
+        "status": "route_child_timeout",
+        "title": "Current route receipt trail"
+      },
+      {
+        "id": "event-loop-fabric-latest-recap",
+        "next_event": "optimal_action_requested",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\LATEST_RECAP.md",
+        "proof": {
+          "event_id": "dfe49443e7add4e1",
+          "sha256": "bbb927997e90ffd5065c69e9573ff5ee189316ffc1a1b4946536ffbab8093e32",
+          "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\LATEST_RECAP.md",
+          "status": "receipt_source",
+          "timestamp": "2026-07-08T20:24:19Z"
+        },
+        "status": "fabric_receipt_exists",
+        "title": "Event Fabric Latest Recap"
+      }
+    ],
+    "routed_loops": [
+      "world-to-game",
+      "owner-proxy-red-team"
+    ],
+    "source_roots": [
+      {
+        "exists": true,
+        "hash_scope": "directory_root_path_exists_mtime",
+        "id": "vault",
+        "path": "[LOCAL_AI_OS]/Obsidian Vault",
+        "role": "vault_root",
+        "sha256": "903ed0e3600a4d2cc8ef51d8e6201ee28483c1913ef9c5887a68cfb5bd56bba8",
+        "timestamp": "2026-07-08T08:16:26Z"
+      },
+      {
+        "exists": true,
+        "hash_scope": "directory_root_path_exists_mtime",
+        "id": "repo",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype",
+        "role": "repo_root",
+        "sha256": "a78d13eb554e06123f7179e2d62d1f1569e247ffa9ff786c306500baba09be4d",
+        "timestamp": "2026-07-10T00:09:20Z"
+      },
+      {
+        "exists": true,
+        "hash_scope": "directory_root_path_exists_mtime",
+        "id": "event-bus",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-driven-loop\\events.jsonl",
+        "role": "event_bus",
+        "sha256": "b17ae619a011c288765ad724f6b1f8b170ba66b9b2e5ad9f725d60b7b98e9129",
+        "timestamp": "2026-07-08T20:24:18Z"
+      },
+      {
+        "exists": true,
+        "hash_scope": "directory_root_path_exists_mtime",
+        "id": "route-dir",
+        "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype\\runs\\event-loop-fabric\\loops\\working-space-viewport\\route-00043-dfe49443e7add4e1",
+        "role": "route_receipt_dir",
+        "sha256": "9f1f9e63938210b4a3bbf3a06a13c51d9a338bd35d3c758cc7a4dbb0370fee8a",
+        "timestamp": "2026-07-08T06:34:56Z"
+      }
+    ],
+    "success_oracle": "A red-team reviewer can identify live workspace state visible and inspectable with source path/timestamp/proof."
+  }
+}

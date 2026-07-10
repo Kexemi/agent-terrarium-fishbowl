@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "title": "Slice A Runtime Fixture",
+    "source_mode": "OFFLINE_FIXTURE",
+    "warning": "public/world.json is missing; this fixture only proves the world-to-game runtime. Emit manual_world_compile before claiming live AI-OS state.",
+    "generated_from": "runtime_fixture_not_truth_compiler",
+    "event_id": "e308f229927efd61",
+    "created_at": "2026-07-07T22:02:38Z"
+  },
+  "tilemap": {
+    "width": 42,
+    "height": 30,
+    "tile_size": 32,
+    "biome": "night_forge_marsh",
+    "weather": "proof_mist"
+  },
+  "viewport": {
+    "definition": "working_space_viewport",
+    "success_oracle": "Fixture proves runtime shape only; live state requires generated public/world.json.",
+    "source_roots": [
+      {"id": "vault-state", "path": "System/Automation/Vault-State.md", "timestamp": "2026-07-07T22:02:38Z", "exists": true},
+      {"id": "event-fabric", "path": "runs/event-loop-fabric/LATEST_RECAP.md", "timestamp": "2026-07-07T22:12:58Z", "exists": true}
+    ],
+    "active_loops": ["world-to-game", "working-space-viewport"],
+    "event_bus": {"path": "runs/event-driven-loop/events.jsonl", "timestamp": "2026-07-07T22:20:32Z", "event_count": 12, "current_event_id": "e308f229927efd61"},
+    "receipts": [{"id": "route-00023", "path": "runs/event-loop-fabric/loops/world-to-game/route-00023-e308f229927efd61", "status": "fixture_route"}],
+    "gates": [{"id": "no-slow-time-cron-work-loops", "title": "No Slow Time-Cron Work Loops", "status": "locked"}],
+    "artifacts": [{"id": "public-world-fixture", "path": "public/world.fixture.json", "status": "offline_fixture"}],
+    "objects": [
+      {"entity_id": "vault-state", "title": "Vault State Root", "visible_as": "source_root", "source_path": "System/Automation/Vault-State.md", "timestamp": "2026-07-07T22:02:38Z", "proof_status": "fixture_source_label", "state": "visible", "next_event": "manual_world_compile", "x": 5, "y": 7},
+      {"entity_id": "working-space-viewport", "title": "Working-Space Viewport Loop", "visible_as": "agent_sprite", "source_path": "docs/WORKING-SPACE-VIEWPORT-CONTRACT.md", "timestamp": "2026-07-07T22:20:32Z", "proof_status": "fixture_loop_label", "state": "active", "next_event": "viewport_artifact_changed", "x": 8, "y": 11},
+      {"entity_id": "source-to-world", "title": "Source Compiler Sprite", "visible_as": "agent_sprite", "source_path": "tests/world/test_compile_world.py", "timestamp": "known_blocker", "proof_status": "missing_world_json", "state": "blocked", "next_event": "manual_world_compile", "x": 18, "y": 12},
+      {"entity_id": "no-slow-time-cron-work-loops", "title": "No Slow Time-Cron Work Loops", "visible_as": "locked_door", "source_path": "route hard_gates_preserved contract", "timestamp": "2026-07-07T22:02:38Z", "proof_status": "hard_gate_preserved", "state": "locked", "next_event": "gate_required", "x": 11, "y": 26},
+      {"entity_id": "route-00023", "title": "Route Receipt Light", "visible_as": "receipt_light", "source_path": "runs/event-loop-fabric/loops/world-to-game/route-00023-e308f229927efd61", "timestamp": "2026-07-07T22:12:58Z", "proof_status": "fixture_receipt_label", "state": "visible", "next_event": "red_team_review_requested", "x": 26, "y": 18},
+      {"entity_id": "missing-compiler-fog", "title": "Missing Compiler Fog", "visible_as": "fog_alarm", "source_path": "public/world.json", "timestamp": "missing", "proof_status": "proof_failed_missing_world_json", "state": "fog", "next_event": "manual_world_compile", "x": 16, "y": 10}
+    ]
+  },
+  "organs": [
+    {
+      "id": "inbox-marsh",
+      "title": "Inbox Marsh",
+      "kind": "intake",
+      "state": "ore_heavy",
+      "x": 5,
+      "y": 7,
+      "w": 5,
+      "h": 4,
+      "body": "Raw owner signals are reeds and crates. Useful ore can become quests only after source-to-world compiles it.",
+      "proof": {
+        "status": "fixture_pending_compile",
+        "source_path": "System/Automation/Vault-State.md",
+        "timestamp": "2026-07-07T22:02:38Z"
+      },
+      "next_event": "manual_world_compile"
+    },
+    {
+      "id": "compiler-forge",
+      "title": "Compiler Forge",
+      "kind": "compiler",
+      "state": "waiting_for_world_json",
+      "x": 16,
+      "y": 5,
+      "w": 6,
+      "h": 5,
+      "body": "The forge should turn live source paths and timestamps into terrain, entities, quests, and proof physics.",
+      "proof": {
+        "status": "proof_failed_missing_world_json",
+        "source_path": "docs/AGENT-TERRARIUM-GAME-PLAN-AND-REDTEAM-CONSTITUTION.md",
+        "timestamp": "2026-07-07T22:02:38Z"
+      },
+      "next_event": "manual_world_compile"
+    },
+    {
+      "id": "agent-quarter",
+      "title": "Agent Quarter",
+      "kind": "agents",
+      "state": "event_fabric_awake",
+      "x": 28,
+      "y": 7,
+      "w": 6,
+      "h": 5,
+      "body": "Customized loops have bodies here: source-to-world, world-to-game, proof-playtest, red team, and gate router.",
+      "proof": {
+        "status": "route_receipts_exist",
+        "source_path": "runs/event-loop-fabric/LATEST_RECAP.md",
+        "timestamp": "2026-07-07T22:12:58Z"
+      },
+      "next_event": "playtest_result"
+    },
+    {
+      "id": "proof-orchard",
+      "title": "Proof Orchard",
+      "kind": "proof",
+      "state": "fruit_unverified",
+      "x": 25,
+      "y": 19,
+      "w": 6,
+      "h": 4,
+      "body": "Screenshots, test passes, and source ledgers should become fruit and light. Missing proof becomes fog.",
+      "proof": {
+        "status": "needs_screenshot",
+        "source_path": "artifacts/screenshots",
+        "timestamp": "pending"
+      },
+      "next_event": "screenshot_changed"
+    },
+    {
+      "id": "gatehouse",
+      "title": "Gatehouse",
+      "kind": "gate",
+      "state": "hard_gates_locked",
+      "x": 12,
+      "y": 20,
+      "w": 5,
+      "h": 5,
+      "body": "External sends, spend, credentials, destructive moves, curated vault writes, deploys, and persistent services stay locked.",
+      "proof": {
+        "status": "preserved",
+        "source_path": "route hard_gates_preserved contract",
+        "timestamp": "2026-07-07T22:02:38Z"
+      },
+      "next_event": "gate_required"
+    },
+    {
+      "id": "revenue-horizon",
+      "title": "Revenue Horizon",
+      "kind": "north_star",
+      "state": "bridge_under_construction",
+      "x": 33,
+      "y": 23,
+      "w": 5,
+      "h": 4,
+      "body": "The world keeps the family-security north star visible without making customer contact or public promises.",
+      "proof": {
+        "status": "north_star_only",
+        "source_path": "SOUL.md primal goals",
+        "timestamp": "session_bootstrap"
+      },
+      "next_event": "optimal_action_requested"
+    }
+  ],
+  "agents": [
+    {
+      "id": "source-to-world",
+      "title": "Source Compiler Sprite",
+      "role": "compiler",
+      "state": "blocked",
+      "mood": "red",
+      "x": 18,
+      "y": 12,
+      "body": "Cannot provide live terrain until scripts/compile_world.py writes data/public world.json.",
+      "proof": {"status": "missing_world_json", "source_path": "tests/world/test_compile_world.py", "timestamp": "known_blocker"},
+      "next_event": "manual_world_compile"
+    },
+    {
+      "id": "world-to-game",
+      "title": "Runtime Builder Sprite",
+      "role": "renderer",
+      "state": "active",
+      "mood": "green",
+      "x": 23,
+      "y": 13,
+      "body": "Builds canvas tilemap, player movement, sprite animation, camera, and proof inspector.",
+      "proof": {"status": "this_route", "source_path": "src/terrarium-runtime.js", "timestamp": "route-00023"},
+      "next_event": "screenshot_changed"
+    },
+    {
+      "id": "proof-playtest",
+      "title": "Proof Playtester Sprite",
+      "role": "playtest",
+      "state": "waiting_for_screenshot",
+      "mood": "gold",
+      "x": 27,
+      "y": 22,
+      "body": "Should wake after screenshots and layout proof exist.",
+      "proof": {"status": "pending", "source_path": "artifacts/screenshots", "timestamp": "pending"},
+      "next_event": "red_team_review_requested"
+    },
+    {
+      "id": "owner-proxy-red-team",
+      "title": "Owner-Proxy Critic Sprite",
+      "role": "critic",
+      "state": "armed",
+      "mood": "violet",
+      "x": 30,
+      "y": 17,
+      "body": "Fails dashboard skins, fake liveness, clipped phone surfaces, and absent proof trails.",
+      "proof": {"status": "not_yet_exercised", "source_path": "docs/AGENT-TERRARIUM-GAME-PLAN-AND-REDTEAM-CONSTITUTION.md", "timestamp": "2026-07-07T22:02:38Z"},
+      "next_event": "red_team_review_requested"
+    },
+    {
+      "id": "owner-gate-router",
+      "title": "Gate Router Sprite",
+      "role": "safety",
+      "state": "watching",
+      "mood": "blue",
+      "x": 14,
+      "y": 25,
+      "body": "Surfaces only true hard gates with exact approval lines.",
+      "proof": {"status": "hard_gates_preserved", "source_path": "route loop contract", "timestamp": "2026-07-07T22:02:38Z"},
+      "next_event": "gate_required"
+    }
+  ],
+  "gates": [
+    {"id": "no-slow-time-cron-work-loops", "title": "No Slow Time-Cron Work Loops", "x": 11, "y": 26, "status": "locked"},
+    {"id": "no-external-deploy", "title": "No External Deploy Without Approval", "x": 18, "y": 27, "status": "locked"}
+  ],
+  "resources": [
+    {"id": "proof-light", "title": "Proof Light", "x": 26, "y": 18, "amount": 2},
+    {"id": "family-security-ember", "title": "Family Security Ember", "x": 36, "y": 24, "amount": 1}
+  ],
+  "fog": [
+    {"id": "missing-compiler-fog", "x": 16, "y": 10, "w": 7, "h": 4, "reason": "world.json not compiled yet"}
+  ],
+  "quests": [
+    {"id": "slice-a", "title": "Slice A — Living Source Forge", "event_id": "e308f229927efd61", "next_event": "manual_world_compile"},
+    {"id": "runtime-proof", "title": "Capture browser-playable runtime screenshot", "event_id": "e308f229927efd61", "next_event": "screenshot_changed"}
+  ],
+  "receipts": [
+    {"id": "route-00023", "title": "world-to-game runtime route", "path": "runs/event-loop-fabric/loops/world-to-game/route-00023-e308f229927efd61", "status": "in_progress"}
+  ]
+}

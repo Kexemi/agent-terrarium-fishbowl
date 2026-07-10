@@ -1,0 +1,18 @@
+{
+  "absolute_local_path_hits": 0,
+  "debug_runtime_public_default": false,
+  "file_count": 8,
+  "files": {
+    "PUBLIC-BOUNDARY.md": "af13ac7ca631fd3179a918652189ff5ead2a6ed5adf3f07b246b703ea7e3b412",
+    "index.html": "a4c574e5927e98ef1bf28cd944da533561e7feb0956be11fd86859e836c686d9",
+    "public/owner_guide.json": "1b08cf791389de949b407cffc6f9e03491cd965ba1273ced7fb4ea8d185f0f23",
+    "public/world.fixture.json": "ddd54e09d5eebf42fd3dc60f274dd2a036cafddf913cbfdf9fc070f92d25e750",
+    "public/world.json": "68a1106eb3352ac480f1cdf524b575e8a2c287c2b9620fab1fd973298dac668b",
+    "src/terrarium-engine.js": "2d18eac622153580fa5e142e8c66b31c85a5be182086ca6bdf12b20c08001753",
+    "src/terrarium-runtime.js": "552c15c93c36ff2a06c0c37d6262f6d32a2e229564c5fd8b6851d5b57e435b8e",
+    "src/terrarium-style.css": "a3f09580e45ebf53fd83d9db12d009d316e1335f4e6c4a9f8d56b3879d73877a"
+  },
+  "read_only": true,
+  "schema": "agent_terrarium_public_safe.v1",
+  "secret_hits": 0
+}
