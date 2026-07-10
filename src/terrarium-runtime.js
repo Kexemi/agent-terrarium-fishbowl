@@ -13,12 +13,12 @@ import {
   snapshotEngine,
   applyWorldSnapshot,
   joystickMagnitudeForDistance,
-} from './terrarium-engine.js?v=35e2adecbd19';
+} from './terrarium-engine.js?v=5a33e64bf76e';
 import {
   getBuildingArtProfile,
   getBuildingDisplayLabel,
   getBuildingVisualState,
-} from './terrarium-building-art.js?v=35e2adecbd19';
+} from './terrarium-building-art.js?v=5a33e64bf76e';
 
 const canvas = document.getElementById('gameCanvas');
 const playfield = document.getElementById('playfield');
@@ -104,7 +104,7 @@ async function checkForAppUpdate() {
       if (!response.ok) return { ok: false, reason: `version_http_${response.status}` };
       const latest = await response.json();
       const nextBuild = String(latest?.version || '').trim();
-      if (!nextBuild || nextBuild === appBuildId || nextBuild === '35e2adecbd19') {
+      if (!nextBuild || nextBuild === appBuildId || nextBuild === '5a33e64bf76e') {
         return { ok: true, changed: false, build: appBuildId };
       }
       const url = new URL(window.location.href);

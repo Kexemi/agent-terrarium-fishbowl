@@ -1,6 +1,6 @@
 {
   "schema": "agent_terrarium_app_version.v1",
-  "version": "35e2adecbd19",
+  "version": "5a33e64bf76e",
   "update_mode": "foreground_network_check",
   "service_worker": false
 }
