@@ -11,6 +11,11 @@ import {
   snapshotEngine,
   applyWorldSnapshot,
 } from './terrarium-engine.js';
+import {
+  getBuildingArtProfile,
+  getBuildingDisplayLabel,
+  getBuildingVisualState,
+} from './terrarium-building-art.js';
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -608,12 +613,12 @@ function draw() {
   drawTiles(world, rect);
   drawPond(world);
   drawRoads(world);
-  drawQueueCrates(world);
   world.fog.forEach(drawFog);
   world.resources.forEach(drawResource);
   world.receipts.forEach(drawProofLantern);
   world.gates.forEach(drawGate);
   world.buildings.forEach(drawBuilding);
+  drawQueueCrates(world);
   drawWaterwheel(world);
   world.quests.forEach(drawQuestMarker);
   world.agents.forEach(drawAgent);
@@ -769,122 +774,747 @@ function drawQueueCrates(world) {
 }
 
 function drawBuilding(building) {
-  const archetype = buildingArchetype(building);
-  if (archetype === 'orchard') {
-    drawOrchard(building);
-    return;
+  const profile = getBuildingArtProfile(building);
+  const box = buildingRenderBox(building);
+  ctx.save();
+  drawBuildingSite(building, box, profile);
+  switch (profile.id) {
+    case 'source-foundation': drawSourceFoundation(building, box, profile); break;
+    case 'hearth': drawHearthHouse(building, box, profile); break;
+    case 'granary': drawWorkGranary(building, box, profile); break;
+    case 'sorting': drawSortingShed(building, box, profile); break;
+    case 'workshop': drawWaterwheelWorkshop(building, box, profile); break;
+    case 'library': drawLookoutLibrary(building, box, profile); break;
+    case 'hall': drawStewardsHall(building, box, profile); break;
+    case 'mill': drawMillStream(building, box, profile); break;
+    case 'tool-shed': drawToolShed(building, box, profile); break;
+    case 'orchard': drawProofOrchard(building, box, profile); break;
+    case 'shrine': drawOwnerOpsShrine(building, box, profile); break;
+    default: drawCottage(building, box, profile); break;
   }
+  if (profile.id !== 'source-foundation') {
+    drawBuildingSign(building, box, profile);
+    drawBuildingProofBeacon(building, box, profile);
+  }
+  drawBuildingSelection(building, box, profile);
+  ctx.restore();
+}
+
+function buildingRenderBox(building) {
   const s = toScreen(building.x, building.y);
   const sourceW = building.w * TILE;
   const sourceH = building.h * TILE;
-  const w = clamp(sourceW, 92, 148);
-  const h = clamp(sourceH, 76, 116);
-  const x = s.x + (sourceW - w) / 2;
-  const y = s.y + sourceH - h;
-  const palette = buildingPalette(archetype, building.proof?.status);
+  const w = clamp(sourceW - 4, 96, 154);
+  const h = clamp(sourceH - 2, 82, 122);
+  return {
+    x: Math.round(s.x + (sourceW - w) / 2),
+    y: Math.round(s.y + sourceH - h),
+    w: Math.round(w),
+    h: Math.round(h),
+    sourceW,
+    sourceH,
+  };
+}
+
+function drawBuildingSite(building, box, profile) {
+  if (profile.id === 'source-foundation') return;
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  const baseY = y + h;
   ctx.save();
-  ctx.fillStyle = 'rgba(47,45,32,0.26)';
-  ctx.fillRect(x + 5, y + h - 3, w, 9);
-  ctx.fillStyle = palette.wall;
-  ctx.fillRect(x + 5, y + 31, w - 10, h - 31);
-  ctx.fillStyle = palette.trim;
-  ctx.fillRect(x + 5, y + 48, w - 10, 4);
-  ctx.fillStyle = palette.roof;
-  ctx.fillRect(x - 3, y + 20, w + 6, 16);
-  ctx.fillRect(x + 7, y + 9, w - 14, 16);
-  ctx.fillRect(x + 19, y, w - 38, 13);
-  ctx.fillStyle = palette.roofLight;
-  ctx.fillRect(x + 9, y + 11, w - 18, 4);
-  ctx.fillStyle = '#5b3b2e';
-  ctx.fillRect(x + w / 2 - 9, y + h - 34, 18, 34);
-  ctx.fillStyle = '#d9a75f';
-  ctx.fillRect(x + w / 2 + 4, y + h - 18, 3, 3);
-  ctx.fillStyle = palette.light;
-  ctx.fillRect(x + 17, y + 50, 16, 14);
-  ctx.fillRect(x + w - 33, y + 50, 16, 14);
-  ctx.fillStyle = '#6d4a35';
-  ctx.fillRect(x + 15, y + 48, 20, 3);
-  ctx.fillRect(x + w - 35, y + 48, 20, 3);
-  ctx.fillStyle = '#5f7541';
-  ctx.fillRect(x + 12, y + h - 7, 22, 5);
-  ctx.fillRect(x + w - 35, y + h - 7, 22, 5);
-  if (archetype === 'workshop') {
-    ctx.fillStyle = '#5e392b';
-    ctx.fillRect(x + w - 26, y - 12, 12, 28);
-    ctx.fillStyle = '#d8c198';
-    ctx.fillRect(x + w - 28, y - 15, 16, 5);
+  switch (profile.id) {
+    case 'hearth': {
+      ctx.fillStyle = p.stone;
+      for (let i = 0; i < 4; i += 1) ctx.fillRect(x + Math.round(w * 0.61) + (i % 2) * 3, baseY - 2 + i * 7, 18, 5);
+      ctx.fillStyle = p.foliage;
+      ctx.fillRect(x + 9, baseY - 8, 31, 6);
+      ctx.fillRect(x + w - 39, baseY - 8, 31, 6);
+      ctx.fillStyle = p.accent;
+      for (let i = 0; i < 6; i += 1) ctx.fillRect(x + 13 + (i % 3) * 9 + (i > 2 ? w - 49 : 0), baseY - 12 + (i % 2) * 3, 3, 3);
+      break;
+    }
+    case 'granary': {
+      ctx.fillStyle = '#b28d5d';
+      ctx.fillRect(x + 3, baseY - 7, w + 18, 11);
+      ctx.fillStyle = '#dcc083';
+      for (let i = 0; i < 7; i += 1) ctx.fillRect(x + 8 + i * 18, baseY - 5, 11, 3);
+      ctx.fillStyle = p.trim;
+      ctx.fillRect(x - 7, baseY - 22, 5, 24);
+      ctx.fillRect(x - 8, baseY - 19, 27, 4);
+      ctx.fillStyle = '#d7aa4f';
+      ctx.fillRect(x + w - 2, baseY - 20, 19, 16);
+      ctx.fillStyle = '#f0ca6c';
+      ctx.fillRect(x + w + 1, baseY - 17, 13, 4);
+      break;
+    }
+    case 'sorting': {
+      ctx.fillStyle = '#8f744f';
+      ctx.fillRect(x + 3, baseY - 5, w + 17, 9);
+      ctx.fillStyle = p.trim;
+      for (let i = 0; i < 6; i += 1) ctx.fillRect(x + 9 + i * 20, baseY - 3, 12, 3);
+      ctx.fillStyle = '#5d4c3c';
+      ctx.fillRect(x + w + 2, baseY - 26, 19, 5);
+      ctx.fillRect(x + w + 16, baseY - 26, 5, 26);
+      break;
+    }
+    case 'workshop': {
+      ctx.fillStyle = p.stone;
+      ctx.fillRect(x - 2, baseY - 8, w + 22, 12);
+      ctx.fillStyle = p.metal;
+      for (let i = 0; i < 5; i += 1) ctx.fillRect(x + 10 + i * 24, baseY - 5, 11, 3);
+      ctx.fillStyle = p.roofDark;
+      ctx.fillRect(x + w + 3, baseY - 17, 19, 4);
+      ctx.fillRect(x + w + 7, baseY - 25, 4, 25);
+      break;
+    }
+    case 'library': {
+      ctx.fillStyle = p.stone;
+      for (let i = 0; i < 5; i += 1) ctx.fillRect(x + w - 36 + (i % 2) * 4, baseY - 3 + i * 6, 18, 4);
+      ctx.fillStyle = p.metal;
+      ctx.fillRect(x - 3, baseY - 13, 24, 4);
+      ctx.fillRect(x, baseY - 23, 4, 14);
+      ctx.fillRect(x + 17, baseY - 23, 4, 14);
+      break;
+    }
+    case 'hall': {
+      ctx.fillStyle = p.stone;
+      ctx.fillRect(x - 7, baseY - 7, w + 14, 11);
+      ctx.fillStyle = 'rgba(255,245,205,0.18)';
+      for (let i = 0; i < 8; i += 1) ctx.fillRect(x - 3 + i * 20, baseY - 5, 13, 3);
+      ctx.fillStyle = p.metal;
+      ctx.fillRect(x - 3, baseY - 27, 4, 25);
+      ctx.fillRect(x + w - 1, baseY - 27, 4, 25);
+      ctx.fillStyle = p.window;
+      ctx.fillRect(x - 5, baseY - 31, 8, 8);
+      ctx.fillRect(x + w - 3, baseY - 31, 8, 8);
+      break;
+    }
+    case 'mill': {
+      ctx.fillStyle = '#4c8e8b';
+      ctx.fillRect(x + w - 32, baseY - 12, 54, 14);
+      ctx.fillStyle = '#7bc1b8';
+      ctx.fillRect(x + w - 28, baseY - 8, 46, 4);
+      ctx.fillStyle = p.wallDark;
+      ctx.fillRect(x + w - 34, baseY - 18, 38, 5);
+      ctx.fillRect(x + w, baseY - 18, 5, 19);
+      break;
+    }
+    case 'tool-shed': {
+      ctx.fillStyle = '#b99461';
+      for (let i = 0; i < 14; i += 1) ctx.fillRect(x + 7 + ((i * 17) % Math.max(20, w - 12)), baseY - 4 + (i % 3) * 3, 4, 2);
+      ctx.fillStyle = p.wallDark;
+      for (let i = 0; i < 4; i += 1) ctx.fillRect(x + w - 5 + i * 4, baseY - 13 - i * 3, 22, 4);
+      break;
+    }
+    case 'orchard': {
+      ctx.fillStyle = '#6f8c4d';
+      for (let row = 0; row < 3; row += 1) ctx.fillRect(x + 4, y + 17 + row * 34, w - 8, 3);
+      ctx.fillStyle = '#8c6d43';
+      ctx.fillRect(x - 4, baseY - 5, w + 8, 5);
+      break;
+    }
+    case 'shrine': {
+      ctx.fillStyle = p.stone;
+      for (let i = 0; i < 4; i += 1) ctx.fillRect(x + Math.round(w / 2) - 8 + (i % 2) * 4, baseY - 3 + i * 7, 16, 5);
+      ctx.fillStyle = p.foliage;
+      ctx.fillRect(x + 5, baseY - 8, 25, 5);
+      ctx.fillRect(x + w - 30, baseY - 8, 25, 5);
+      break;
+    }
+    default: {
+      ctx.fillStyle = p.stone;
+      ctx.fillRect(x + Math.round(w / 2), baseY - 3, 20, 6);
+    }
   }
-  ctx.strokeStyle = state.selected?.id === building.id ? '#fff2a8' : '#4b342d';
-  ctx.lineWidth = state.selected?.id === building.id ? 4 : 2;
-  ctx.strokeRect(x + 1, y + 21, w - 2, h - 21);
-  ctx.fillStyle = '#fff7d6';
-  ctx.font = '900 10px "Segoe UI", sans-serif';
-  ctx.fillText(shortLabel(building.title), x + 8, y + h - 10, w - 16);
-  const proofText = `${building.proof?.status || ''} ${building.state || ''}`.toLowerCase();
-  drawProofSpark(x + w - 13, y + 11, proofText.includes('fail') || proofText.includes('missing') ? '#b94e62' : '#f4c85d');
   ctx.restore();
 }
 
-function buildingArchetype(building) {
-  const text = `${building.id || ''} ${building.title || ''} ${building.kind || ''}`.toLowerCase();
-  if (text.includes('proof-orchard') || text.includes('orchard')) return 'orchard';
-  if (text.includes('workflow') || text.includes('granary') || text.includes('queue')) return 'granary';
-  if (text.includes('inbox') || text.includes('sorting') || text.includes('refinery')) return 'sorting';
-  if (text.includes('service') || text.includes('hearth')) return 'hearth';
-  if (text.includes('terrarium') || text.includes('workshop') || text.includes('event-bus')) return 'workshop';
-  if (text.includes('library') || text.includes('viewport')) return 'library';
-  if (text.includes('constitution') || text.includes('steward')) return 'hall';
-  if (text.includes('owner') || text.includes('guide')) return 'farmhouse';
-  if (text.includes('capability') || text.includes('tool shed')) return 'tool-shed';
-  return 'cottage';
+function drawContactShadow(box, inset = 3, lift = 0) {
+  const { x, y, w, h } = box;
+  ctx.fillStyle = 'rgba(43, 47, 31, 0.22)';
+  ctx.fillRect(x + inset + 6, y + h - 5 + lift, w - inset * 2, 8);
+  ctx.fillStyle = 'rgba(43, 47, 31, 0.13)';
+  ctx.fillRect(x + inset + 12, y + h + 3 + lift, w - inset * 2 - 12, 4);
 }
 
-function buildingPalette(kind, proofStatus) {
-  const status = String(proofStatus || '').toLowerCase();
-  if (status.includes('fail') || status.includes('missing')) return { wall: '#b46c65', roof: '#7c3f4b', roofLight: '#c76970', trim: '#edd2a3', light: '#ffe7a7' };
-  const palettes = {
-    granary: { wall: '#c37a4c', roof: '#7b3f36', roofLight: '#aa5946', trim: '#efc478', light: '#ffedaa' },
-    sorting: { wall: '#d29a58', roof: '#84503b', roofLight: '#b26a4b', trim: '#f3d28d', light: '#fff0b8' },
-    hearth: { wall: '#e2b46e', roof: '#8a4c45', roofLight: '#bc6c58', trim: '#fff0b3', light: '#fff8cf' },
-    workshop: { wall: '#b67852', roof: '#4d6960', roofLight: '#76917b', trim: '#e6c384', light: '#d8f2c0' },
-    library: { wall: '#d0a468', roof: '#596c7c', roofLight: '#8193a0', trim: '#f2d9a0', light: '#d7ecdd' },
-    hall: { wall: '#c58d62', roof: '#6f4b64', roofLight: '#92708a', trim: '#efd19e', light: '#f5e3bf' },
-    farmhouse: { wall: '#e2bd7c', roof: '#774550', roofLight: '#a65d67', trim: '#fff0b5', light: '#fff7d1' },
-    'tool-shed': { wall: '#ae7b55', roof: '#4e6a50', roofLight: '#728d67', trim: '#dec18c', light: '#e6efbb' },
-    cottage: { wall: '#d7aa6d', roof: '#7d5141', roofLight: '#a86c51', trim: '#f3d99e', light: '#fff0b3' },
-  };
-  return palettes[kind] || palettes.cottage;
+function drawMasonryTexture(x, y, w, h, palette, seed = 0) {
+  ctx.fillStyle = palette.stone;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(255, 242, 196, 0.16)';
+  for (let row = 0; row < h; row += 8) {
+    const offset = ((row / 8 + seed) % 2) * 7;
+    for (let col = -offset; col < w; col += 15) ctx.fillRect(x + col, y + row, 11, 2);
+  }
+  ctx.fillStyle = 'rgba(50, 43, 39, 0.18)';
+  for (let row = 6; row < h; row += 8) ctx.fillRect(x, y + row, w, 1);
 }
 
-function drawOrchard(building) {
-  const s = toScreen(building.x, building.y);
+function drawTimberFrame(x, y, w, h, palette) {
+  ctx.fillStyle = palette.wallDark;
+  ctx.fillRect(x, y, w, 4);
+  ctx.fillRect(x, y + h - 4, w, 4);
+  ctx.fillRect(x, y, 4, h);
+  ctx.fillRect(x + w - 4, y, 4, h);
+  ctx.fillRect(x + Math.round(w / 2) - 2, y, 4, h);
+  ctx.strokeStyle = palette.wallDark;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x + 4, y + 5);
+  ctx.lineTo(x + Math.round(w / 2) - 3, y + h - 5);
+  ctx.moveTo(x + w - 5, y + 5);
+  ctx.lineTo(x + Math.round(w / 2) + 3, y + h - 5);
+  ctx.stroke();
+}
+
+function drawPixelRoofTexture(x, y, w, h, palette, stagger = 0) {
+  ctx.fillStyle = palette.roof;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = palette.roofLight;
+  ctx.fillRect(x + 3, y + 3, Math.max(4, w - 6), 3);
+  ctx.fillStyle = palette.roofDark;
+  ctx.fillRect(x, y + h - 4, w, 4);
+  for (let row = 10; row < h - 4; row += 7) {
+    const shift = ((row / 7 + stagger) % 2) * 6;
+    ctx.fillStyle = 'rgba(255,255,220,0.10)';
+    for (let col = 4 - shift; col < w - 4; col += 13) ctx.fillRect(x + col, y + row, 9, 2);
+  }
+}
+
+function drawSteppedGableRoof(cx, top, width, height, palette, stagger = 0) {
+  const rows = Math.max(4, Math.floor(height / 4));
+  for (let row = 0; row < rows; row += 1) {
+    const half = Math.max(5, Math.round((((row + 1) / rows) * width) / 8) * 4);
+    const ry = top + row * 4;
+    ctx.fillStyle = row === rows - 1 ? palette.roofDark : palette.roof;
+    ctx.fillRect(Math.round(cx - half), ry, half * 2, 5);
+    if ((row + stagger) % 2 === 0 && row > 0) {
+      ctx.fillStyle = palette.roofLight;
+      ctx.fillRect(Math.round(cx - half + 5), ry, Math.max(3, half * 2 - 10), 2);
+    }
+  }
+}
+
+function drawWindow(x, y, w, h, profile, lit = true, mullion = true) {
+  const p = profile.palette;
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+  ctx.fillStyle = lit ? p.window : '#8ca8a3';
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(255,255,226,0.36)';
+  ctx.fillRect(x + 2, y + 2, Math.max(2, w - 4), 3);
+  if (mullion) {
+    ctx.fillStyle = p.wallDark;
+    ctx.fillRect(x + Math.floor(w / 2) - 1, y, 2, h);
+    ctx.fillRect(x, y + Math.floor(h / 2), w, 2);
+  }
+}
+
+function drawDoor(x, y, w, h, profile, doubleDoor = false) {
+  const p = profile.palette;
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x - 3, y - 4, w + 6, h + 4);
+  ctx.fillStyle = p.door;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(255,255,220,0.12)';
+  ctx.fillRect(x + 3, y + 3, Math.max(3, w - 6), 3);
+  if (doubleDoor) {
+    ctx.fillStyle = p.trim;
+    ctx.fillRect(x + Math.floor(w / 2) - 1, y, 2, h);
+  }
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + w - 5, y + Math.floor(h / 2), 3, 3);
+}
+
+function drawSmokePuffs(x, y, profile, seed = 0) {
+  const t = reducedMotion ? 0 : state.tick * 0.09;
+  for (let i = 0; i < 4; i += 1) {
+    const rise = (t + i * 9 + seed) % 34;
+    const drift = Math.round(Math.sin((t + i * 5) / 8) * 4);
+    ctx.globalAlpha = 0.28 - i * 0.035;
+    ctx.fillStyle = i % 2 ? '#eee2c3' : '#d4d2bd';
+    const size = 5 + i * 2;
+    ctx.fillRect(x + drift - Math.floor(size / 2), y - rise - size, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawHearthHouse(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 9, y + 10, 18, 66, profile.palette, 1);
+  ctx.fillStyle = p.stone;
+  ctx.fillRect(x + 7, y + 7, 22, 7);
+  drawSmokePuffs(x + 18, y + 7, profile, 3);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 18, y + 42, w - 27, h - 42);
+  ctx.fillStyle = p.wallLight;
+  ctx.fillRect(x + 22, y + 47, w - 35, 5);
+  drawTimberFrame(x + 18, y + 42, w - 27, h - 42, profile.palette);
+  drawPixelRoofTexture(x + 8, y + 31, w - 12, 18, profile.palette, 1);
+  drawSteppedGableRoof(x + Math.round(w * 0.62), y + 3, 78, 42, profile.palette, 1);
+  ctx.fillStyle = p.wallLight;
+  ctx.fillRect(x + Math.round(w * 0.62) - 27, y + 33, 54, 18);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + Math.round(w * 0.62) - 3, y + 34, 6, 15);
+  drawWindow(x + 31, y + 59, 17, 19, profile, true);
+  drawWindow(x + w - 40, y + 55, 18, 22, profile, true);
+  drawDoor(x + Math.round(w * 0.57), y + h - 38, 21, 38, profile);
+  ctx.fillStyle = p.stone;
+  ctx.fillRect(x + 37, y + h - 12, w - 48, 8);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + 38, y + h - 27, 4, 21);
+  ctx.fillRect(x + w - 20, y + h - 27, 4, 21);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(x + 35, y + h - 29, w - 50, 5);
+  ctx.fillStyle = p.foliage;
+  ctx.fillRect(x + 22, y + h - 9, 23, 6);
+  ctx.fillRect(x + w - 44, y + h - 9, 22, 6);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + 27, y + h - 13, 4, 4);
+  ctx.fillRect(x + 36, y + h - 12, 4, 4);
+  ctx.fillRect(x + w - 36, y + h - 13, 4, 4);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + Math.round(w * 0.62) - 4, y + 40, 8, 8);
+  ctx.fillStyle = '#ffd879';
+  ctx.fillRect(x + Math.round(w * 0.62) - 1, y + 37, 3, 8);
+}
+
+function drawWorkGranary(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 6, y + h - 24, w - 33, 24, p, 2);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 7, y + 39, w - 35, h - 58);
+  ctx.fillStyle = p.wallLight;
+  ctx.fillRect(x + 12, y + 45, w - 44, 4);
+  drawTimberFrame(x + 7, y + 39, w - 35, h - 58, p);
+  drawPixelRoofTexture(x + 4, y + 29, w - 30, 17, p, 0);
+  drawPixelRoofTexture(x + 13, y + 17, w - 48, 15, p, 1);
+  drawPixelRoofTexture(x + 27, y + 7, w - 74, 13, p, 0);
+  const siloX = x + w - 32;
+  ctx.fillStyle = p.stone;
+  ctx.fillRect(siloX, y + 33, 27, h - 36);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(siloX + 4, y + 31, 19, h - 34);
+  ctx.fillStyle = p.roofLight;
+  ctx.fillRect(siloX + 7, y + 23, 13, 8);
+  ctx.fillRect(siloX + 4, y + 27, 19, 5);
+  ctx.fillStyle = p.trim;
+  for (let sy = y + 43; sy < y + h - 10; sy += 17) ctx.fillRect(siloX + 2, sy, 23, 2);
+  drawDoor(x + 31, y + h - 54, 42, 37, profile, true);
+  ctx.strokeStyle = p.trim;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x + 34, y + h - 51);
+  ctx.lineTo(x + 70, y + h - 20);
+  ctx.moveTo(x + 70, y + h - 51);
+  ctx.lineTo(x + 34, y + h - 20);
+  ctx.stroke();
+  drawWindow(x + 45, y + 46, 16, 14, profile, true, false);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + 52, y + 3, 4, 15);
+  ctx.fillRect(x + 52, y + 3, 17, 4);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + 66, y + 7, 4, 10);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + 62, y + 17, 12, 5);
+}
+
+function drawSortingShed(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 6, y + 40, w - 12, h - 40, p, 1);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 9, y + 44, w - 18, h - 44);
+  const bayW = Math.floor((w - 10) / 3);
+  for (let i = 0; i < 3; i += 1) {
+    drawSteppedGableRoof(x + 5 + bayW * i + Math.floor(bayW / 2), y + 8 + (i % 2) * 3, bayW + 8, 35, p, i);
+    drawWindow(x + 17 + bayW * i, y + 43, 18, 14, profile, false, false);
+  }
+  ctx.fillStyle = p.roofDark;
+  ctx.fillRect(x + 4, y + 59, w - 8, 6);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(x + 7, y + 65, w - 30, 5);
+  ctx.fillStyle = '#8f6a45';
+  ctx.fillRect(x + 12, y + 70, w - 45, 7);
+  ctx.fillRect(x + 14, y + 77, 5, 25);
+  ctx.fillRect(x + w - 38, y + 77, 5, 25);
+  drawDoor(x + w - 32, y + h - 39, 21, 39, profile);
+  const bins = ['#5e9f96', '#d9a34f', '#b8675d'];
+  bins.forEach((color, i) => {
+    const bx = x + 13 + i * 26;
+    const by = y + h - 21;
+    ctx.fillStyle = '#5b4031';
+    ctx.fillRect(bx - 2, by - 4, 23, 20);
+    ctx.fillStyle = color;
+    ctx.fillRect(bx, by, 19, 14);
+    ctx.fillStyle = '#f1d18c';
+    ctx.fillRect(bx + 5, by + 4, 9, 3);
+  });
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + w - 18, y + 18, 9, 28);
+  ctx.fillStyle = p.roofLight;
+  ctx.fillRect(x + w - 21, y + 15, 15, 5);
+}
+
+function drawWaterwheelWorkshop(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 5, y + 67, w - 10, h - 67, p, 0);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 7, y + 39, w - 14, 37);
+  drawTimberFrame(x + 7, y + 39, w - 14, 37, p);
+  drawPixelRoofTexture(x + 1, y + 27, w - 2, 19, p, 1);
+  drawPixelRoofTexture(x + 18, y + 15, w - 45, 15, p, 0);
+  drawMasonryTexture(x + w - 35, y - 7, 17, 51, p, 2);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + w - 38, y - 11, 23, 6);
+  drawSmokePuffs(x + w - 26, y - 11, profile, 7);
+  drawDoor(x + 18, y + h - 40, 24, 40, profile);
+  drawWindow(x + 54, y + 49, 22, 19, profile, true);
+  const gearX = x + w - 34;
+  const gearY = y + 61;
+  ctx.strokeStyle = p.metal;
+  ctx.lineWidth = 5;
+  ctx.strokeRect(gearX - 12, gearY - 12, 24, 24);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(gearX - 4, gearY - 4, 8, 8);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(gearX - 2, gearY - 17, 4, 34);
+  ctx.fillRect(gearX - 17, gearY - 2, 34, 4);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(x + 46, y + h - 13, 43, 5);
+  ctx.fillStyle = p.metal;
+  for (let i = 0; i < 4; i += 1) ctx.fillRect(x + 49 + i * 10, y + h - 22 + (i % 2) * 3, 4, 12);
+}
+
+function drawLookoutLibrary(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  const towerX = x + 8;
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(towerX, y + 30, 48, h - 30);
+  drawMasonryTexture(towerX, y + h - 24, 48, 24, p, 1);
+  drawSteppedGableRoof(towerX + 24, y - 5, 58, 39, p, 1);
+  ctx.fillStyle = p.wallLight;
+  ctx.fillRect(towerX + 6, y + 35, 36, 5);
+  drawWindow(towerX + 13, y + 45, 22, 27, profile, true);
+  ctx.fillStyle = p.wallDark;
+  for (let sy = y + 50; sy < y + 70; sy += 6) ctx.fillRect(towerX + 15, sy, 18, 2);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 51, y + 50, w - 57, h - 50);
+  drawPixelRoofTexture(x + 47, y + 38, w - 49, 18, p, 0);
+  drawTimberFrame(x + 51, y + 50, w - 57, h - 50, p);
+  drawWindow(x + 66, y + 62, 23, 22, profile, true);
+  drawDoor(x + w - 35, y + h - 37, 20, 37, profile);
+  ctx.strokeStyle = p.metal;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(towerX + 29, y - 2);
+  ctx.lineTo(towerX + 41, y - 13);
+  ctx.lineTo(towerX + 53, y - 11);
+  ctx.stroke();
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(towerX + 51, y - 15, 12, 7);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(towerX + 22, y + 10, 4, 8);
+  ctx.fillRect(towerX + 19, y + 8, 10, 3);
+}
+
+function drawStewardsHall(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 5, y + h - 25, w - 10, 25, p, 0);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 7, y + 48, w - 14, h - 48);
+  drawTimberFrame(x + 7, y + 48, w - 14, h - 48, p);
+  drawPixelRoofTexture(x + 1, y + 35, w - 2, 19, p, 1);
+  drawSteppedGableRoof(x + Math.round(w / 2), y + 3, 82, 48, p, 0);
+  ctx.fillStyle = p.wallLight;
+  ctx.fillRect(x + Math.round(w / 2) - 27, y + 40, 54, 20);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + Math.round(w / 2) - 3, y + 43, 6, 15);
+  drawWindow(x + 19, y + 62, 18, 20, profile, true);
+  drawWindow(x + w - 37, y + 62, 18, 20, profile, true);
+  drawDoor(x + Math.round(w / 2) - 13, y + h - 39, 26, 39, profile, true);
+  ctx.fillStyle = p.stone;
+  ctx.fillRect(x + Math.round(w / 2) - 23, y + h - 7, 46, 7);
+  ctx.fillRect(x + Math.round(w / 2) - 18, y + h - 12, 36, 5);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + 21, y + h - 33, 5, 29);
+  ctx.fillRect(x + w - 26, y + h - 33, 5, 29);
+  ctx.fillStyle = p.roofDark;
+  ctx.fillRect(x + Math.round(w / 2) - 15, y - 13, 30, 16);
+  ctx.fillStyle = p.roof;
+  ctx.fillRect(x + Math.round(w / 2) - 20, y - 18, 40, 7);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + Math.round(w / 2) - 5, y - 10, 10, 10);
+  ctx.fillStyle = '#ffe092';
+  ctx.fillRect(x + Math.round(w / 2) - 2, y - 8, 4, 6);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + Math.round(w / 2) - 6, y + 43, 12, 10);
+}
+
+function drawMillStream(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  drawMasonryTexture(x + 7, y + 63, w - 25, h - 63, p, 3);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 8, y + 43, w - 26, 30);
+  drawTimberFrame(x + 8, y + 43, w - 26, 30, p);
+  drawSteppedGableRoof(x + Math.round((w - 20) / 2), y + 7, w - 8, 40, p, 1);
+  drawWindow(x + 22, y + 51, 18, 15, profile, true);
+  drawDoor(x + 52, y + h - 38, 22, 38, profile);
+  const wheelX = x + w - 18;
+  const wheelY = y + 78;
+  ctx.strokeStyle = p.roofDark;
+  ctx.lineWidth = 5;
+  ctx.strokeRect(wheelX - 17, wheelY - 17, 34, 34);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(wheelX - 3, wheelY - 3, 6, 6);
+  ctx.fillRect(wheelX - 2, wheelY - 21, 4, 42);
+  ctx.fillRect(wheelX - 21, wheelY - 2, 42, 4);
+  ctx.strokeStyle = p.trim;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(wheelX - 15, wheelY - 15);
+  ctx.lineTo(wheelX + 15, wheelY + 15);
+  ctx.moveTo(wheelX + 15, wheelY - 15);
+  ctx.lineTo(wheelX - 15, wheelY + 15);
+  ctx.stroke();
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + w - 32, y + 43, 29, 6);
+  ctx.fillRect(x + w - 5, y + 43, 6, 40);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + w - 7, y + 80, 10, 4);
+}
+
+function drawToolShed(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 8, y + 48, w - 18, h - 48);
+  ctx.fillStyle = p.wallDark;
+  for (let px = x + 12; px < x + w - 13; px += 11) ctx.fillRect(px, y + 50, 3, h - 52);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + 2, y + 35, w - 8, 17);
+  ctx.fillStyle = p.roofLight;
+  for (let px = x + 7; px < x + w - 10; px += 9) ctx.fillRect(px, y + 38, 4, 10);
+  ctx.fillStyle = p.roofDark;
+  ctx.fillRect(x + 1, y + 49, w - 6, 5);
+  const bayX = x + 16;
+  ctx.fillStyle = '#3e3931';
+  ctx.fillRect(bayX, y + 59, 48, h - 59);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(bayX + 4, y + 63, 40, 4);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(bayX + 9, y + 72, 4, 20);
+  ctx.fillRect(bayX + 20, y + 71, 15, 4);
+  ctx.fillRect(bayX + 26, y + 71, 4, 22);
+  ctx.strokeStyle = p.metal;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(bayX + 38, y + 71);
+  ctx.lineTo(bayX + 33, y + 91);
+  ctx.stroke();
+  drawDoor(x + w - 36, y + h - 37, 20, 37, profile);
+  ctx.fillStyle = p.wallDark;
+  for (let i = 0; i < 4; i += 1) ctx.fillRect(x + w - 11 + i * 5, y + h - 13 - i * 3, 22, 4);
+  ctx.strokeStyle = p.trim;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x + w - 16, y + h - 28, 24, 28);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + w - 10, y + h - 22, 12, 4);
+}
+
+function drawProofOrchard(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
   const cbr = Number(state.world?.fishbowl?.proof?.cbr_r || 0);
   const mesReal = state.world?.fishbowl?.proof?.mes_r_status === 'REAL';
-  const ripe = clamp(Math.round(cbr * 4), 0, 8);
-  ctx.save();
+  const ripe = clamp(Math.round(cbr * 5), 0, 10);
+  drawContactShadow(box, 2, 2);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + 8, y + 23, w - 16, 4);
+  ctx.fillRect(x + 8, y + 62, w - 16, 4);
+  for (let col = 0; col < 4; col += 1) ctx.fillRect(x + 13 + col * 30, y + 17, 4, 72);
   for (let i = 0; i < 6; i += 1) {
-    const x = s.x + 24 + (i % 3) * 38;
-    const y = s.y + 28 + Math.floor(i / 3) * 50;
-    ctx.fillStyle = '#6e4a32';
-    ctx.fillRect(x - 3, y + 12, 7, 23);
-    ctx.fillStyle = mesReal ? '#4f864c' : '#6f8c50';
-    ctx.fillRect(x - 15, y, 31, 22);
-    ctx.fillRect(x - 10, y - 8, 22, 34);
+    const tx = x + 18 + (i % 3) * 38;
+    const ty = y + 20 + Math.floor(i / 3) * 45;
+    ctx.fillStyle = '#68472f';
+    ctx.fillRect(tx - 3, ty + 17, 7, 25);
+    ctx.fillStyle = mesReal ? '#477b45' : p.foliage;
+    ctx.fillRect(tx - 14, ty + 3, 29, 19);
+    ctx.fillRect(tx - 9, ty - 6, 20, 31);
+    ctx.fillStyle = '#78a356';
+    ctx.fillRect(tx - 8, ty - 2, 12, 7);
     const fruitCount = clamp(ripe - i, 0, 3);
-    ctx.fillStyle = mesReal ? '#d95f54' : '#e5b853';
-    for (let f = 0; f < fruitCount; f += 1) ctx.fillRect(x - 8 + f * 8, y + 5 + (f % 2) * 6, 4, 4);
+    ctx.fillStyle = mesReal ? '#dc6356' : '#e1b44f';
+    for (let f = 0; f < fruitCount; f += 1) ctx.fillRect(tx - 8 + f * 8, ty + 8 + (f % 2) * 6, 4, 4);
   }
-  ctx.fillStyle = '#fff3c5';
-  ctx.font = '900 10px "Segoe UI", sans-serif';
-  ctx.fillText('Proof Orchard', s.x + 14, s.y + 127);
-  if (state.selected?.id === building.id) {
-    ctx.strokeStyle = '#fff2a8';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(s.x + 6, s.y - 12, 126, 145);
+  const hutX = x + w - 45;
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(hutX, y + h - 35, 37, 35);
+  drawSteppedGableRoof(hutX + 18, y + h - 54, 44, 23, p, 1);
+  drawDoor(hutX + 13, y + h - 24, 12, 24, profile);
+  ctx.fillStyle = '#d6a84f';
+  ctx.fillRect(x + 5, y + h - 27, 17, 27);
+  ctx.fillStyle = p.roofDark;
+  for (let sy = y + h - 22; sy < y + h - 4; sy += 6) ctx.fillRect(x + 8, sy, 11, 2);
+  ctx.fillStyle = p.accent;
+  for (let i = 0; i < 3; i += 1) {
+    ctx.fillRect(x + 28 + i * 17, y + h - 14, 14, 10);
+    ctx.fillStyle = p.trim;
+    ctx.fillRect(x + 32 + i * 17, y + h - 11, 6, 3);
+    ctx.fillStyle = p.accent;
   }
-  ctx.restore();
 }
 
+function drawOwnerOpsShrine(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box, 10, 1);
+  ctx.fillStyle = p.stone;
+  for (let i = 0; i < 5; i += 1) ctx.fillRect(x + Math.round(w / 2) - 8 + (i % 2) * 4, y + h - 8 + i * 7, 16, 5);
+  ctx.fillStyle = p.wallDark;
+  ctx.fillRect(x + 18, y + 43, 7, h - 45);
+  ctx.fillRect(x + w - 25, y + 43, 7, h - 45);
+  ctx.fillRect(x + 18, y + 45, w - 36, 6);
+  drawSteppedGableRoof(x + Math.round(w / 2), y - 5, w - 4, 48, p, 1);
+  ctx.fillStyle = p.roofDark;
+  ctx.fillRect(x + 2, y + 39, w - 4, 6);
+  ctx.fillStyle = '#4a382f';
+  ctx.fillRect(x + 31, y + 54, w - 62, h - 61);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(x + 35, y + 59, w - 70, 8);
+  ctx.fillStyle = '#fff1bf';
+  ctx.fillRect(x + 39, y + 70, w - 78, 20);
+  ctx.fillStyle = p.wallDark;
+  for (let sy = y + 74; sy < y + 87; sy += 5) ctx.fillRect(x + 43, sy, w - 86, 2);
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + Math.round(w / 2) - 2, y + 43, 4, 11);
+  ctx.fillRect(x + Math.round(w / 2) - 7, y + 52, 14, 9);
+  ctx.fillStyle = '#ffe08a';
+  ctx.fillRect(x + Math.round(w / 2) - 3, y + 54, 6, 5);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(x + 11, y + 51, 5, 20);
+  ctx.fillRect(x + w - 16, y + 51, 5, 20);
+  ctx.fillStyle = '#f5e6b2';
+  ctx.fillRect(x + 7, y + 68, 11, 3);
+  ctx.fillRect(x + w - 18, y + 68, 11, 3);
+}
+
+function drawSourceFoundation(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  ctx.fillStyle = 'rgba(60, 54, 42, 0.18)';
+  ctx.fillRect(x - 4, y + h - 21, w + 8, 24);
+  drawMasonryTexture(x - 2, y + h - 18, w + 4, 16, p, hash(building.id || '') % 3);
+  ctx.fillStyle = '#5a4938';
+  ctx.fillRect(x + 5, y + h - 22, w - 10, 5);
+  ctx.strokeStyle = p.accent;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.72;
+  ctx.beginPath();
+  ctx.moveTo(x + 9, y + h - 8);
+  ctx.lineTo(x + 24, y + h - 15);
+  ctx.lineTo(x + Math.round(w / 2), y + h - 11);
+  ctx.lineTo(x + w - 24, y + h - 15);
+  ctx.lineTo(x + w - 8, y + h - 8);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = p.metal;
+  ctx.fillRect(x + Math.round(w / 2) - 9, y + h - 18, 18, 12);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + Math.round(w / 2) - 4, y + h - 14, 8, 4);
+  ctx.fillStyle = p.wallDark;
+  for (let i = 0; i < 4; i += 1) {
+    const rx = i < 2 ? x + 4 + i * 9 : x + w - 13 + (i - 2) * 9;
+    ctx.fillRect(rx, y + h - 7, 4, 13);
+  }
+}
+
+function drawCottage(building, box, profile) {
+  const p = profile.palette;
+  const { x, y, w, h } = box;
+  drawContactShadow(box);
+  ctx.fillStyle = p.wall;
+  ctx.fillRect(x + 11, y + 45, w - 22, h - 45);
+  drawTimberFrame(x + 11, y + 45, w - 22, h - 45, p);
+  drawSteppedGableRoof(x + Math.round(w / 2) - 9, y + 7, w - 20, 43, p, 1);
+  drawWindow(x + 25, y + 58, 18, 18, profile, true);
+  drawWindow(x + w - 43, y + 58, 18, 18, profile, true);
+  drawDoor(x + Math.round(w / 2) + 12, y + h - 37, 20, 37, profile);
+  ctx.fillStyle = p.foliage;
+  ctx.fillRect(x + 19, y + h - 9, 28, 6);
+  ctx.fillStyle = p.accent;
+  ctx.fillRect(x + 25, y + h - 12, 4, 4);
+  ctx.fillRect(x + 37, y + h - 11, 4, 4);
+}
+
+function drawBuildingSign(building, box, profile) {
+  const p = profile.palette;
+  const label = getBuildingDisplayLabel(building);
+  ctx.font = '900 9px "Segoe UI", sans-serif';
+  const measured = Math.ceil(ctx.measureText(label).width);
+  const signW = clamp(measured + 14, 52, box.w - 12);
+  const signX = box.x + 6;
+  const signY = box.y + box.h - 17;
+  ctx.fillStyle = 'rgba(54, 41, 32, 0.88)';
+  ctx.fillRect(signX, signY, signW, 14);
+  ctx.fillStyle = p.trim;
+  ctx.fillRect(signX + 2, signY + 2, signW - 4, 2);
+  ctx.fillStyle = '#fff5d2';
+  ctx.fillText(label, signX + 6, signY + 11, signW - 10);
+}
+
+function drawBuildingProofBeacon(building, box, profile) {
+  const visual = getBuildingVisualState(building);
+  const x = box.x + box.w - 13;
+  const y = box.y + box.h - 27;
+  const pulse = reducedMotion ? 0 : Math.round((Math.sin(state.tick / 15 + hash(building.id || '') % 7) + 1) * 1.5);
+  ctx.fillStyle = profile.palette.metal;
+  ctx.fillRect(x - 5, y - 6, 10, 13);
+  ctx.fillStyle = visual.beacon;
+  ctx.fillRect(x - 3, y - 4, 6, 7);
+  ctx.globalAlpha = 0.22;
+  ctx.strokeStyle = visual.beacon;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x - 6 - pulse, y - 7 - pulse, 12 + pulse * 2, 14 + pulse * 2);
+  ctx.globalAlpha = 1;
+}
+
+function drawBuildingSelection(building, box, profile) {
+  if (state.selected?.id !== building.id) return;
+  const color = '#fff2a8';
+  const x = box.x - 4;
+  const y = box.y - 7;
+  const w = box.w + 8;
+  const h = box.h + 13;
+  const corner = 13;
+  ctx.globalAlpha = 0.92;
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, corner, 3);
+  ctx.fillRect(x, y, 3, corner);
+  ctx.fillRect(x + w - corner, y, corner, 3);
+  ctx.fillRect(x + w - 3, y, 3, corner);
+  ctx.fillRect(x, y + h - 3, corner, 3);
+  ctx.fillRect(x, y + h - corner, 3, corner);
+  ctx.fillRect(x + w - corner, y + h - 3, corner, 3);
+  ctx.fillRect(x + w - 3, y + h - corner, 3, corner);
+  ctx.globalAlpha = 0.2;
+  ctx.fillStyle = profile.palette.accent;
+  ctx.fillRect(box.x + 7, box.y + box.h + 3, box.w - 14, 4);
+  ctx.globalAlpha = 1;
+}
 function shortLabel(text) {
   const s = String(text || 'item');
   return s.length > 18 ? `${s.slice(0, 17)}…` : s;
