@@ -6,10 +6,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'" />
   <title>Agent Terrarium · Cozy AI-OS Fishbowl</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307151c'/%3E%3Cpath d='M7 21h18v4H7zM9 9h4v4H9zm10 0h4v4h-4zM13 15h6v4h-6z' fill='%2369f2a8'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="src/terrarium-style.css?v=fishbowl-v1" />
+  <link rel="stylesheet" href="src/terrarium-style.css?v=mobile-v2" />
 </head>
 <body>
-<div class="shell" data-app="agent-terrarium-fishbowl-v1" data-no-document-scroll="true">
+<div class="shell" data-app="agent-terrarium-mobile-v2" data-no-document-scroll="true">
   <header class="hud">
     <div class="brand">
       <div class="orb" aria-hidden="true"></div>
@@ -21,7 +21,7 @@
     <div class="mode-pill" id="modePill" data-mode="loading">loading</div>
   </header>
 
-  <main class="stage-wrap" aria-label="browser-playable 2D AI-OS pixel world">
+  <main class="stage-wrap" id="playfield" aria-label="browser-playable 2D AI-OS pixel world">
     <canvas id="gameCanvas" width="960" height="640" aria-label="Cozy top-down AI-OS homestead"></canvas>
     <aside class="morning-brief" id="morningBrief" data-tone="loading" aria-label="Morning Brief">
       <div class="brief-heading"><span class="brief-sun" aria-hidden="true">☀</span><b>Morning Brief</b><small id="briefFresh">local snapshot</small></div>
@@ -36,37 +36,62 @@
       <div class="game-message" id="gameMessage">Wake in the working room.</div>
     </div>
     <div class="world-badge" id="worldBadge">loading world state</div>
-    <div class="instructions">Move with WASD/arrows or pad. F follows a worker. E gathers proof. Space looks. G opens Owner guide.</div>
-    <div class="move-pad" aria-label="touch movement controls">
-      <button type="button" data-move="up" aria-label="Move up">▲</button>
-      <button type="button" data-move="left" aria-label="Move left">◀</button>
-      <button type="button" data-move="down" aria-label="Move down">▼</button>
-      <button type="button" data-move="right" aria-label="Move right">▶</button>
+    <div class="instructions">Touch the left ground to move. Drag elsewhere to look around. WASD or arrow keys also move. Tap a thing to inspect it.</div>
+
+    <div class="touch-hint" id="touchHint" data-visible="true" data-side="left" aria-hidden="true">
+      <span class="ghost-thumb" aria-hidden="true"></span>
+      <span>Touch and slide to move</span>
     </div>
+
+    <div class="action-toast" id="actionToast" data-visible="false" data-tone="ok" role="status" aria-live="polite">Ready.</div>
+
+    <div class="joystick-zone" id="joystickZone" data-side="left" aria-label="Floating movement joystick" aria-hidden="true">
+      <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
+    </div>
+
+    <nav class="camera-controls" aria-label="camera controls">
+      <button id="worldZoomOut" type="button" aria-label="Zoom world out">−</button>
+      <button id="cameraRecenter" type="button" aria-label="Recenter camera on player">◎</button>
+      <button id="worldZoomIn" type="button" aria-label="Zoom world in">＋</button>
+    </nav>
+
+    <section class="dossier" id="inspector" data-dossier-state="compact" tabindex="0" aria-label="selected place dossier" aria-live="polite">
+      <div class="dossier-heading">
+        <span class="dossier-kicker" id="selectedKicker">Terrarium</span>
+        <div class="dossier-tools">
+          <button id="copyProof" class="dossier-tool" type="button">Copy</button>
+          <button id="dossierToggle" class="dossier-tool" type="button" aria-expanded="false">Details</button>
+        </div>
+      </div>
+      <div class="dossier-summary">
+        <h2 class="place-title" id="selectedTitle">Booting runtime</h2>
+        <div class="state-chip" id="selectedState">loading</div>
+      </div>
+      <div class="dossier-detail" id="dossierDetail">
+        <div class="copy"><p id="selectedBody">Waiting for workspace state. Offline fallback remains visibly labeled.</p></div>
+        <div class="proof-line" aria-label="selected proof trail">
+          <span id="proofSource"><b>Source</b> pending</span>
+          <span id="proofTime"><b>Time</b> pending</span>
+          <span id="proofStatus"><b>Proof</b> pending</span>
+        </div>
+        <div class="detail-actions" aria-label="secondary selected-place actions">
+          <button id="verbLook" type="button">Look</button>
+          <button id="verbFollow" type="button">Follow</button>
+          <button id="verbGather" type="button">Gather proof</button>
+          <button id="verbClear" type="button">Clear fog</button>
+          <button id="verbGate" type="button">Gate check</button>
+          <button id="verbGuide" type="button">Owner guide</button>
+          <button id="controlSideToggle" type="button" aria-pressed="false">Move: Left</button>
+          <button id="replayTouchHint" type="button">Show movement hint</button>
+          <button id="proofToggle" class="proof-toggle" type="button" aria-expanded="false">Raw proof</button>
+        </div>
+      </div>
+      <button id="primaryAction" class="primary-action" type="button">Inspect nearby</button>
+    </section>
   </main>
 
-  <section class="inspector" id="inspector" tabindex="0" aria-label="proof inspector" aria-live="polite">
-    <div class="inspector-label"><span>proof inspector</span><button id="proofToggle" class="proof-toggle" type="button" aria-expanded="false">Proof trail</button></div>
-    <h2 class="place-title" id="selectedTitle">Booting runtime</h2>
-    <div class="state-chip" id="selectedState">loading</div>
-    <div class="copy"><p id="selectedBody">Waiting for workspace state. Offline fallback is labeled in the hidden proof marker, not shown as the first-screen experience.</p></div>
-    <div class="proof-line" aria-label="selected proof trail">
-      <span id="proofSource"><b>Source</b> pending</span>
-      <span id="proofTime"><b>Time</b> pending</span>
-      <span id="proofStatus"><b>Proof</b> pending</span>
-    </div>
-  </section>
-
-  <nav class="verb-bar" aria-label="player verbs">
-    <button id="verbLook" type="button">Look</button>
-    <button id="verbFollow" type="button" aria-label="Follow or assign nearby worker"><span>Follow</span><small>Assign</small></button>
-    <button id="verbGather" type="button">Gather proof</button>
-    <button id="verbClear" type="button">Clear fog</button>
-    <button id="verbGate" type="button">Gate check</button>
-    <button id="verbGuide" type="button">Owner guide</button>
-  </nav>
   <span class="offline-proof-marker" hidden data-offline-mode="OFFLINE_FIXTURE">offline fixture marker for automated proof only</span>
 </div>
-<script type="module" src="src/terrarium-runtime.js?v=fishbowl-v1"></script>
+<script type="module" src="src/terrarium-runtime.js?v=mobile-v2"></script>
 </body>
 </html>

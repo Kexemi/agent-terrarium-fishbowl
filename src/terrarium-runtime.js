@@ -1,5 +1,6 @@
 import {
   TILE,
+  POND_LAYOUT,
   createTerrariumEngine,
   stepTerrariumEngine,
   selectAtWorldPoint,
@@ -10,6 +11,7 @@ import {
   getRenderScene,
   snapshotEngine,
   applyWorldSnapshot,
+  joystickMagnitudeForDistance,
 } from './terrarium-engine.js';
 import {
   getBuildingArtProfile,
@@ -18,10 +20,22 @@ import {
 } from './terrarium-building-art.js';
 
 const canvas = document.getElementById('gameCanvas');
+const playfield = document.getElementById('playfield');
 const ctx = canvas.getContext('2d');
 const worldBadge = document.getElementById('worldBadge');
 const modePill = document.getElementById('modePill');
+const inspector = document.getElementById('inspector');
+const dossierToggle = document.getElementById('dossierToggle');
+const copyProof = document.getElementById('copyProof');
+const primaryAction = document.getElementById('primaryAction');
+const joystickZone = document.getElementById('joystickZone');
+const joystickBase = document.getElementById('joystickBase');
+const joystickKnob = document.getElementById('joystickKnob');
+const cameraRecenter = document.getElementById('cameraRecenter');
+const worldZoomOut = document.getElementById('worldZoomOut');
+const worldZoomIn = document.getElementById('worldZoomIn');
 const selectedTitle = document.getElementById('selectedTitle');
+const selectedKicker = document.getElementById('selectedKicker');
 const selectedState = document.getElementById('selectedState');
 const selectedBody = document.getElementById('selectedBody');
 const proofSource = document.getElementById('proofSource');
@@ -34,6 +48,11 @@ const verbGather = document.getElementById('verbGather');
 const verbClear = document.getElementById('verbClear');
 const verbGate = document.getElementById('verbGate');
 const verbGuide = document.getElementById('verbGuide');
+const controlSideToggle = document.getElementById('controlSideToggle');
+const replayTouchHint = document.getElementById('replayTouchHint');
+const touchHint = document.getElementById('touchHint');
+const actionToast = document.getElementById('actionToast');
+const instructions = document.querySelector('.instructions');
 const proofValue = document.getElementById('proofValue');
 const signalValue = document.getElementById('signalValue');
 const questTitle = document.getElementById('questTitle');
@@ -46,15 +65,45 @@ const briefGate = document.getElementById('briefGate');
 const briefFresh = document.getElementById('briefFresh');
 
 const WORLD_REFRESH_MS = 15_000;
+const FIXED_STEP_MS = 1000 / 60;
+const JOYSTICK_DEAD_ZONE = 12;
+const JOYSTICK_MAX_REACH = 58;
+const CAMERA_LEASH_RATIO = 0.14;
+const TAP_TRAVEL_LIMIT = 8;
+let actionToastTimer = null;
 const queryParams = new URLSearchParams(window.location.search);
 const fullMapMode = queryParams.get('full-map') === '1';
 if (fullMapMode) document.documentElement.dataset.fullMap = 'true';
 const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
-const runtimeDebugEnabled = ['127.0.0.1', 'localhost'].includes(window.location.hostname)
-  || queryParams.get('debug') === '1';
+const runtimeDebugEnabled = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
 
 const keys = new Set();
-const virtualKeys = new Set();
+function loadMovementSide() {
+  try {
+    return window.localStorage.getItem('terrarium.movementSide') === 'right' ? 'right' : 'left';
+  } catch {
+    return 'left';
+  }
+}
+function loadTouchHintSeen() {
+  try {
+    return window.localStorage.getItem('terrarium.touchHintSeen') === '1';
+  } catch {
+    return false;
+  }
+}
+const inputState = {
+  pointerRoles: new Map(),
+  pointerTravel: new Map(),
+  movementPointerId: null,
+  cameraPointerId: null,
+  joystickOrigin: null,
+  moveVector: { x: 0, y: 0 },
+  cameraLast: null,
+  cameraFreeLook: { x: 0, y: 0 },
+  worldZoom: 1,
+  movementSide: loadMovementSide(),
+};
 const state = {
   raw: null,
   engine: null,
@@ -63,14 +112,17 @@ const state = {
   error: '',
   tick: 0,
   camera: { x: 0, y: 0 },
-  player: { x: 8.5 * TILE, y: 12.5 * TILE, speed: 3.2, facing: 'down' },
+  player: { x: 8.5 * TILE, y: 12.5 * TILE, speed: 120, facing: 'down' },
   selected: null,
   rawProofOpen: false,
+  dossierState: 'compact',
   logOpen: false,
   snapshotVersion: '',
   lastRefreshAt: '',
   refreshError: '',
   refreshTimer: null,
+  lastFrameAt: 0,
+  accumulatorMs: 0,
 };
 
 function hash(text) {
@@ -161,9 +213,12 @@ async function refreshWorldSnapshot({ force = false } = {}) {
 
 function getViewportSize() {
   const rect = canvas.getBoundingClientRect();
+  const zoom = inputState.worldZoom || 1;
+  const dossierHeight = inspector?.getBoundingClientRect?.().height || 0;
+  const occludedHeight = Math.min(150, Math.max(0, dossierHeight));
   return {
-    width: Math.max(1, rect.width || 390),
-    height: Math.max(1, rect.height || 665),
+    width: Math.max(1, (rect.width || 390) / zoom),
+    height: Math.max(1, ((rect.height || 665) - occludedHeight) / zoom),
   };
 }
 
@@ -408,9 +463,54 @@ function updateHud() {
     : 'Offline safety view · proof-labeled fallback';
 }
 
+function setProofLine(element, label, value) {
+  const heading = document.createElement('b');
+  heading.textContent = label;
+  element.replaceChildren(heading, document.createTextNode(` ${value}`));
+}
+
+function primaryActionFor(item) {
+  const kind = String(item?.visible_as || item?.kind || item?.engineKind || '').toLowerCase();
+  if (kind === 'agent_sprite') return { action: 'followAgent', label: 'Follow worker' };
+  if (['receipt_light', 'resource_light'].includes(kind)) return { action: 'collectProof', label: 'Gather proof' };
+  if (kind === 'fog_alarm') return { action: 'clearFog', label: 'Clear fog' };
+  if (kind === 'locked_door') return { action: 'unlockGate', label: 'Check owner gate' };
+  if (kind === 'owner_guide') return { action: 'openOwnerGuide', label: 'Open owner guide' };
+  return { action: 'inspectNearest', label: 'Inspect nearby' };
+}
+
+function updatePrimaryAction(item) {
+  const descriptor = primaryActionFor(item);
+  primaryAction.dataset.action = descriptor.action;
+  primaryAction.textContent = descriptor.label;
+  primaryAction.disabled = !item;
+}
+
+function dossierKickerFor(item) {
+  const kind = String(item?.visible_as || item?.kind || item?.engineKind || '').toLowerCase();
+  if (kind === 'agent_sprite') return 'Selected worker';
+  if (kind === 'locked_door') return 'Selected owner gate';
+  if (['receipt_light', 'resource_light'].includes(kind)) return 'Selected proof';
+  if (kind === 'fog_alarm') return 'Selected alert';
+  if (kind === 'owner_guide') return 'Owner guide';
+  return item ? 'Selected place' : 'Terrarium';
+}
+
 function updateInspector() {
   const item = state.selected;
-  if (!item) return;
+  inspector.dataset.selected = item ? 'true' : 'false';
+  if (selectedKicker) selectedKicker.textContent = dossierKickerFor(item);
+  if (!item) {
+    selectedTitle.textContent = 'Nothing selected';
+    selectedState.textContent = 'Tap a place';
+    selectedBody.textContent = 'Tap a worker, building, proof light, fog patch, or gate to inspect it.';
+    setProofLine(proofSource, 'Source', '—');
+    setProofLine(proofTime, 'Time', '—');
+    setProofLine(proofStatus, 'Proof', '—');
+    updatePrimaryAction(null);
+    return;
+  }
+  updatePrimaryAction(item);
   const details = state.engine ? inspectEntity(state.engine, item.id) : null;
   selectedTitle.textContent = details?.title || item.title || item.id;
   selectedState.textContent = formatStateLabel(details?.state || item.state || item.role || 'unknown');
@@ -505,15 +605,15 @@ function renderProofLine(details, item) {
   proofToggle.setAttribute('aria-expanded', state.rawProofOpen ? 'true' : 'false');
   proofToggle.textContent = state.rawProofOpen ? 'Hide proof' : 'Proof trail';
   if (state.rawProofOpen) {
-    proofSource.innerHTML = `<b>Source</b> ${escapeText(proof.source)}`;
-    proofTime.innerHTML = `<b>Time</b> ${escapeText(proof.time)}`;
+    setProofLine(proofSource, 'Source', proof.source);
+    setProofLine(proofTime, 'Time', proof.time);
     const hashLabel = String(proof.hashScope).includes('metadata') ? 'metadata hash' : 'source hash';
-    proofStatus.innerHTML = `<b>Proof</b> ${escapeText(proof.status)} · event ${escapeText(proof.eventId)} · ${hashLabel} ${escapeText(String(proof.sha256).slice(0, 12))}`;
+    setProofLine(proofStatus, 'Proof', `${proof.status} · event ${proof.eventId} · ${hashLabel} ${String(proof.sha256).slice(0, 12)}`);
     return;
   }
-  proofSource.innerHTML = '<b>Source</b> linked';
-  proofTime.innerHTML = `<b>Time</b> ${escapeText(compactTime(proof.time))}`;
-  proofStatus.innerHTML = `<b>Proof</b> ${escapeText(formatProofStatus(proof.status))}`;
+  setProofLine(proofSource, 'Source', 'linked');
+  setProofLine(proofTime, 'Time', compactTime(proof.time));
+  setProofLine(proofStatus, 'Proof', formatProofStatus(proof.status));
 }
 
 function updateMorningBrief(hud) {
@@ -545,10 +645,6 @@ function updateGameHud() {
   state.gameHud = hud;
 }
 
-function escapeText(text) {
-  return String(text).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-}
-
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
@@ -557,60 +653,47 @@ function resizeCanvas() {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 }
 
-function updatePlayer() {
-  const inputKeys = [...keys, ...virtualKeys];
+function updatePlayer(deltaMs = FIXED_STEP_MS) {
+  const inputKeys = [...keys];
   const viewportSize = getViewportSize();
-  if (state.engine) {
-    stepTerrariumEngine(state.engine, {
-      keys: inputKeys,
-      deltaMs: 1000 / 60,
-      viewportSize,
-    });
-    state.world = state.engine.world;
-    state.player = state.engine.player;
-    state.camera = state.engine.camera;
-    if (state.engine.selectedId) {
-      state.selected = state.world.entities.find((entity) => entity.id === state.engine.selectedId) || state.selected;
-    }
-    updateGameHud();
-    return;
+  if (!state.engine) return;
+  stepTerrariumEngine(state.engine, {
+    keys: inputKeys,
+    moveVector: state.dossierState === 'expanded' ? { x: 0, y: 0 } : inputState.moveVector,
+    cameraOffset: state.dossierState === 'expanded' ? { x: 0, y: 0 } : inputState.cameraFreeLook,
+    deltaMs,
+    viewportSize,
+  });
+  state.world = state.engine.world;
+  state.player = state.engine.player;
+  state.camera = state.engine.camera;
+  if (state.engine.selectedId) {
+    state.selected = state.world.entities.find((entity) => entity.id === state.engine.selectedId) || state.selected;
   }
-
-  let dx = 0;
-  let dy = 0;
-  if (keys.has('arrowleft') || keys.has('a') || virtualKeys.has('left')) dx -= 1;
-  if (keys.has('arrowright') || keys.has('d') || virtualKeys.has('right')) dx += 1;
-  if (keys.has('arrowup') || keys.has('w') || virtualKeys.has('up')) dy -= 1;
-  if (keys.has('arrowdown') || keys.has('s') || virtualKeys.has('down')) dy += 1;
-  if (dx || dy) {
-    const len = Math.hypot(dx, dy) || 1;
-    state.player.x += (dx / len) * state.player.speed;
-    state.player.y += (dy / len) * state.player.speed;
-    state.player.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-  }
-  const world = state.world;
-  if (!world) return;
-  const worldW = world.tilemap.width * world.tilemap.tileSize;
-  const worldH = world.tilemap.height * world.tilemap.tileSize;
-  state.player.x = clamp(state.player.x, 16, worldW - 16);
-  state.player.y = clamp(state.player.y, 16, worldH - 16);
-  state.camera.x += (state.player.x - viewportSize.width / 2 - state.camera.x) * 0.1;
-  state.camera.y += (state.player.y - viewportSize.height / 2 - state.camera.y) * 0.1;
-  state.camera.x = clamp(state.camera.x, 0, Math.max(0, worldW - viewportSize.width));
-  state.camera.y = clamp(state.camera.y, 0, Math.max(0, worldH - viewportSize.height));
+  updateGameHud();
 }
 
-function draw() {
+function draw(frameAt = performance.now()) {
   resizeCanvas();
-  updatePlayer();
+  const elapsed = state.lastFrameAt ? Math.min(100, Math.max(0, frameAt - state.lastFrameAt)) : FIXED_STEP_MS;
+  state.lastFrameAt = frameAt;
+  state.accumulatorMs = Math.min(FIXED_STEP_MS * 5, state.accumulatorMs + elapsed);
+  while (state.accumulatorMs >= FIXED_STEP_MS) {
+    updatePlayer(FIXED_STEP_MS);
+    state.accumulatorMs -= FIXED_STEP_MS;
+  }
   const rect = canvas.getBoundingClientRect();
+  const zoom = inputState.worldZoom || 1;
+  const viewRect = { width: rect.width / zoom, height: rect.height / zoom };
   ctx.clearRect(0, 0, rect.width, rect.height);
   if (!state.world) {
     requestAnimationFrame(draw);
     return;
   }
+  ctx.save();
+  ctx.scale(zoom, zoom);
   const world = state.world;
-  drawTiles(world, rect);
+  drawTiles(world, viewRect);
   drawPond(world);
   drawRoads(world);
   world.fog.forEach(drawFog);
@@ -623,6 +706,7 @@ function draw() {
   world.quests.forEach(drawQuestMarker);
   world.agents.forEach(drawAgent);
   drawPlayer();
+  ctx.restore();
   drawFishbowlGlass(rect);
   state.tick += 1;
   requestAnimationFrame(draw);
@@ -664,7 +748,7 @@ function drawTiles(world, rect) {
 }
 
 function drawPond(world) {
-  const pond = { x: 18, y: 11, w: 7, h: 4 };
+  const pond = POND_LAYOUT;
   const s = toScreen(pond.x, pond.y);
   const w = pond.w * TILE;
   const h = pond.h * TILE;
@@ -1850,22 +1934,27 @@ function drawFishbowlGlass(rect) {
 }
 
 function selectAt(clientX, clientY) {
-  if (!state.world) return;
+  if (!state.world || state.dossierState === 'expanded') return null;
   const rect = canvas.getBoundingClientRect();
-  const wx = clientX - rect.left + state.camera.x;
-  const wy = clientY - rect.top + state.camera.y;
+  const zoom = inputState.worldZoom || 1;
+  const wx = (clientX - rect.left) / zoom + state.camera.x;
+  const wy = (clientY - rect.top) / zoom + state.camera.y;
   if (state.engine) {
     const hit = selectAtWorldPoint(state.engine, { x: wx, y: wy }, { cycleAfterId: state.selected?.id || '' });
-    if (hit) state.selected = hit;
+    state.selected = hit || null;
+    state.engine.selectedId = hit?.id || null;
+    setDossierState('compact');
     updateInspector();
-    return;
+    return hit || null;
   }
   const tx = wx / TILE;
   const ty = wy / TILE;
   const hitBuilding = state.world.buildings.findLast((b) => tx >= b.x && tx <= b.x + b.w && ty >= b.y && ty <= b.y + b.h);
   const hitAgent = state.world.agents.findLast((a) => Math.hypot(tx - a.x, ty - a.y) < 1.2);
-  state.selected = hitAgent || hitBuilding || state.selected;
+  state.selected = hitAgent || hitBuilding || null;
+  setDossierState('compact');
   updateInspector();
+  return state.selected;
 }
 
 function nearestAgent() {
@@ -1912,9 +2001,146 @@ function focusEntity(entityId) {
   };
 }
 
+function hideJoystick() {
+  joystickZone.dataset.active = 'false';
+  joystickBase.style.left = '0px';
+  joystickBase.style.top = '0px';
+  joystickKnob.style.transform = 'translate(-50%, -50%)';
+}
+
+function releasePointerRole(pointerId) {
+  const role = inputState.pointerRoles.get(pointerId);
+  inputState.pointerRoles.delete(pointerId);
+  inputState.pointerTravel.delete(pointerId);
+  if (role === 'movement' && inputState.movementPointerId === pointerId) {
+    inputState.movementPointerId = null;
+    inputState.joystickOrigin = null;
+    inputState.moveVector = { x: 0, y: 0 };
+    hideJoystick();
+  }
+  if (role === 'camera' && inputState.cameraPointerId === pointerId) {
+    inputState.cameraPointerId = null;
+    inputState.cameraLast = null;
+  }
+}
+
+function resetAllInput(reason = 'manual') {
+  inputState.pointerRoles.clear();
+  inputState.pointerTravel.clear();
+  inputState.movementPointerId = null;
+  inputState.cameraPointerId = null;
+  inputState.joystickOrigin = null;
+  inputState.moveVector = { x: 0, y: 0 };
+  inputState.cameraLast = null;
+  keys.clear();
+  hideJoystick();
+  playfield.dataset.inputReset = reason;
+}
+
+function setDossierState(nextState) {
+  const next = nextState === 'expanded' ? 'expanded' : 'compact';
+  resetAllInput(`dossier_${next}`);
+  state.dossierState = next;
+  inspector.dataset.dossierState = next;
+  dossierToggle.setAttribute('aria-expanded', next === 'expanded' ? 'true' : 'false');
+  dossierToggle.textContent = next === 'expanded' ? 'Collapse' : 'Details';
+}
+
+function claimPointerRole(event) {
+  if (state.dossierState === 'expanded') return null;
+  const rect = playfield.getBoundingClientRect();
+  const localX = event.clientX - rect.left;
+  const isMouse = event.pointerType === 'mouse';
+  const normalizedX = rect.width > 0 ? localX / rect.width : 0;
+  const inMovementZone = !isMouse && (inputState.movementSide === 'right' ? normalizedX >= 0.45 : normalizedX <= 0.55);
+  const inCameraZone = isMouse || (inputState.movementSide === 'right' ? normalizedX < 0.45 : normalizedX > 0.55);
+  let role = null;
+  if (inMovementZone && inputState.movementPointerId === null) {
+    role = 'movement';
+    inputState.movementPointerId = event.pointerId;
+    inputState.joystickOrigin = { x: event.clientX, y: event.clientY };
+    joystickZone.dataset.active = 'true';
+    setTouchHintVisible(false, true);
+    const visualMargin = JOYSTICK_MAX_REACH + 8;
+    const visualX = clamp(localX, visualMargin, Math.max(visualMargin, rect.width - visualMargin));
+    const visualY = clamp(event.clientY - rect.top, visualMargin, Math.max(visualMargin, rect.height - visualMargin));
+    joystickBase.style.left = `${visualX}px`;
+    joystickBase.style.top = `${visualY}px`;
+  } else if (inCameraZone && inputState.cameraPointerId === null) {
+    role = 'camera';
+    inputState.cameraPointerId = event.pointerId;
+    inputState.cameraLast = { x: event.clientX, y: event.clientY };
+  }
+  if (!role) return null;
+  inputState.pointerRoles.set(event.pointerId, role);
+  inputState.pointerTravel.set(event.pointerId, { x: event.clientX, y: event.clientY, total: 0 });
+  try { playfield.setPointerCapture(event.pointerId); } catch {}
+  return role;
+}
+
+function updatePointerTravel(event) {
+  const record = inputState.pointerTravel.get(event.pointerId);
+  if (!record) return 0;
+  record.total += Math.hypot(event.clientX - record.x, event.clientY - record.y);
+  record.x = event.clientX;
+  record.y = event.clientY;
+  return record.total;
+}
+
+function updateJoystickPointer(event) {
+  if (inputState.movementPointerId !== event.pointerId || !inputState.joystickOrigin) return;
+  const rawX = event.clientX - inputState.joystickOrigin.x;
+  const rawY = event.clientY - inputState.joystickOrigin.y;
+  const distance = Math.hypot(rawX, rawY);
+  const capped = Math.min(distance, JOYSTICK_MAX_REACH);
+  const unitX = distance > 0 ? rawX / distance : 0;
+  const unitY = distance > 0 ? rawY / distance : 0;
+  const easedMagnitude = joystickMagnitudeForDistance(distance, JOYSTICK_DEAD_ZONE, JOYSTICK_MAX_REACH);
+  inputState.moveVector = { x: unitX * easedMagnitude, y: unitY * easedMagnitude };
+  joystickKnob.style.transform = `translate(-50%, -50%) translate(${unitX * capped}px, ${unitY * capped}px)`;
+}
+
+function updateCameraPointer(event) {
+  if (inputState.cameraPointerId !== event.pointerId || !inputState.cameraLast) return;
+  const zoom = inputState.worldZoom || 1;
+  const dx = (event.clientX - inputState.cameraLast.x) / zoom;
+  const dy = (event.clientY - inputState.cameraLast.y) / zoom;
+  inputState.cameraLast = { x: event.clientX, y: event.clientY };
+  const viewport = getViewportSize();
+  const maxX = viewport.width * CAMERA_LEASH_RATIO;
+  const maxY = viewport.height * CAMERA_LEASH_RATIO;
+  inputState.cameraFreeLook.x = clamp(inputState.cameraFreeLook.x - dx, -maxX, maxX);
+  inputState.cameraFreeLook.y = clamp(inputState.cameraFreeLook.y - dy, -maxY, maxY);
+}
+
+function handlePointerDown(event) {
+  if (event.target.closest('.dossier, .camera-controls')) return;
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  const role = claimPointerRole(event);
+  if (!role) return;
+  event.preventDefault();
+}
+
+function handlePointerMove(event) {
+  const role = inputState.pointerRoles.get(event.pointerId);
+  if (!role) return;
+  updatePointerTravel(event);
+  if (role === 'movement') updateJoystickPointer(event);
+  if (role === 'camera') updateCameraPointer(event);
+  event.preventDefault();
+}
+
+function handlePointerEnd(event) {
+  const role = inputState.pointerRoles.get(event.pointerId);
+  const travel = inputState.pointerTravel.get(event.pointerId)?.total || 0;
+  if (role === 'camera' && travel <= TAP_TRAVEL_LIMIT && event.type === 'pointerup') selectAt(event.clientX, event.clientY);
+  releasePointerRole(event.pointerId);
+  event.preventDefault();
+}
+
 window.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
-  if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'w', 'a', 's', 'd'].includes(key)) {
+  if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'w', 'a', 's', 'd'].includes(key) && state.dossierState !== 'expanded') {
     keys.add(key);
     event.preventDefault();
   }
@@ -1937,32 +2163,33 @@ window.addEventListener('keydown', (event) => {
 });
 window.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase()));
 window.addEventListener('resize', resizeCanvas);
-canvas.addEventListener('click', (event) => selectAt(event.clientX, event.clientY));
-canvas.addEventListener('touchstart', (event) => {
-  const touch = event.changedTouches[0];
-  if (touch) selectAt(touch.clientX, touch.clientY);
-  event.preventDefault();
-}, { passive: false });
-document.querySelectorAll('[data-move]').forEach((button) => {
-  const direction = button.dataset.move;
-  const press = (event) => {
-    virtualKeys.add(direction);
-    button.dataset.held = 'true';
-    if (event.pointerId && button.setPointerCapture) {
-      try { button.setPointerCapture(event.pointerId); } catch {}
-    }
-    event.preventDefault();
-  };
-  const release = (event) => {
-    virtualKeys.delete(direction);
-    button.dataset.held = 'false';
-    event.preventDefault();
-  };
-  button.addEventListener('pointerdown', press);
-  button.addEventListener('pointerup', release);
-  button.addEventListener('pointercancel', release);
-  button.addEventListener('pointerleave', release);
+playfield.addEventListener('pointerdown', handlePointerDown);
+playfield.addEventListener('pointermove', handlePointerMove);
+playfield.addEventListener('pointerup', handlePointerEnd);
+playfield.addEventListener('pointercancel', handlePointerEnd);
+playfield.addEventListener('lostpointercapture', (event) => releasePointerRole(event.pointerId));
+playfield.addEventListener('contextmenu', (event) => event.preventDefault());
+playfield.addEventListener('dragstart', (event) => event.preventDefault());
+window.addEventListener('blur', () => resetAllInput('blur'));
+window.addEventListener('pagehide', () => resetAllInput('pagehide'));
+window.addEventListener('orientationchange', () => resetAllInput('orientationchange'));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') resetAllInput('visibilitychange');
 });
+
+function showActionToast(result) {
+  if (!actionToast) return;
+  const blocked = result?.reason === 'approval_required';
+  actionToast.dataset.tone = blocked ? 'blocked' : (result?.ok ? 'ok' : 'notice');
+  actionToast.textContent = blocked
+    ? 'Owner gate held · Approval is required. Nothing changed.'
+    : String(result?.message || (result?.ok ? 'Action complete.' : 'Nothing changed.'));
+  actionToast.dataset.visible = 'true';
+  if (actionToastTimer) window.clearTimeout(actionToastTimer);
+  actionToastTimer = window.setTimeout(() => {
+    actionToast.dataset.visible = 'false';
+  }, 3200);
+}
 
 function performAction(action) {
   if (!state.engine) return { ok: false, reason: 'engine_not_ready' };
@@ -1973,7 +2200,39 @@ function performAction(action) {
   state.selected = state.world.entities.find((entity) => entity.id === state.engine.selectedId) || state.selected;
   updateInspector();
   updateGameHud();
+  showActionToast(result);
   return result;
+}
+
+function setTouchHintVisible(visible, remember = false) {
+  if (!touchHint) return;
+  touchHint.dataset.visible = visible ? 'true' : 'false';
+  if (remember && !visible) {
+    try { window.localStorage.setItem('terrarium.touchHintSeen', '1'); } catch {}
+  }
+}
+
+function syncMovementSideButton() {
+  if (!controlSideToggle) return;
+  const right = inputState.movementSide === 'right';
+  controlSideToggle.textContent = `Move: ${right ? 'Right' : 'Left'}`;
+  controlSideToggle.setAttribute('aria-pressed', right ? 'true' : 'false');
+  joystickZone.dataset.side = right ? 'right' : 'left';
+  if (touchHint) touchHint.dataset.side = right ? 'right' : 'left';
+  if (instructions) {
+    instructions.textContent = right
+      ? 'Touch the right ground to move. Drag elsewhere to look around. WASD or arrow keys also move. Tap a thing to inspect it.'
+      : 'Touch the left ground to move. Drag elsewhere to look around. WASD or arrow keys also move. Tap a thing to inspect it.';
+  }
+}
+
+function setMovementSide(nextSide) {
+  const next = nextSide === 'right' ? 'right' : 'left';
+  resetAllInput(`movement_side_${next}`);
+  inputState.movementSide = next;
+  try { window.localStorage.setItem('terrarium.movementSide', next); } catch {}
+  syncMovementSideButton();
+  return next;
 }
 
 verbLook.addEventListener('click', () => performAction('inspectNearest'));
@@ -1982,6 +2241,43 @@ verbGather.addEventListener('click', () => performAction('collectProof'));
 verbClear.addEventListener('click', () => performAction('clearFog'));
 verbGate.addEventListener('click', () => performAction('unlockGate'));
 if (verbGuide) verbGuide.addEventListener('click', () => performAction('openOwnerGuide'));
+if (controlSideToggle) controlSideToggle.addEventListener('click', () => {
+  setMovementSide(inputState.movementSide === 'left' ? 'right' : 'left');
+});
+if (replayTouchHint) replayTouchHint.addEventListener('click', () => {
+  setTouchHintVisible(true);
+  setDossierState('compact');
+});
+setTouchHintVisible(!loadTouchHintSeen());
+syncMovementSideButton();
+primaryAction.addEventListener('click', () => performAction(primaryAction.dataset.action || 'inspectNearest'));
+dossierToggle.addEventListener('click', () => setDossierState(state.dossierState === 'expanded' ? 'compact' : 'expanded'));
+cameraRecenter.addEventListener('click', () => {
+  inputState.cameraFreeLook = { x: 0, y: 0 };
+  cameraRecenter.dataset.recentered = 'true';
+});
+worldZoomOut.addEventListener('click', () => {
+  inputState.worldZoom = clamp(Number((inputState.worldZoom - 0.1).toFixed(2)), 0.8, 1.35);
+  resetAllInput('zoom_out');
+});
+worldZoomIn.addEventListener('click', () => {
+  inputState.worldZoom = clamp(Number((inputState.worldZoom + 0.1).toFixed(2)), 0.8, 1.35);
+  resetAllInput('zoom_in');
+});
+copyProof.addEventListener('click', async () => {
+  const details = state.selected && state.engine ? inspectEntity(state.engine, state.selected.id) : null;
+  const proof = state.selected ? proofDetails(details, state.selected) : null;
+  const payload = proof
+    ? `${selectedTitle.textContent}\nSource: ${proof.source}\nTime: ${proof.time}\nProof: ${proof.status}\nEvent: ${proof.eventId}\nSHA-256: ${proof.sha256}`
+    : 'Nothing selected.';
+  try {
+    await navigator.clipboard.writeText(payload);
+    copyProof.textContent = 'Copied';
+  } catch {
+    copyProof.textContent = 'Copy failed';
+  }
+  window.setTimeout(() => { copyProof.textContent = 'Copy'; }, 1200);
+});
 proofToggle.addEventListener('click', () => {
   state.rawProofOpen = !state.rawProofOpen;
   updateInspector();
@@ -2023,20 +2319,29 @@ function findEmptyPointForTest() {
   return { ok: best.clearance > 5.5, ...best };
 }
 
+function screenPointForWorld(tileX, tileY) {
+  const rect = canvas.getBoundingClientRect();
+  const zoom = inputState.worldZoom || 1;
+  const worldX = Number.isFinite(Number(tileX)) ? Number(tileX) : 0;
+  const worldY = Number.isFinite(Number(tileY)) ? Number(tileY) : 0;
+  const localX = (worldX * TILE - state.camera.x) * zoom;
+  const localY = (worldY * TILE - state.camera.y) * zoom;
+  return {
+    ok: true,
+    x: rect.left + localX,
+    y: rect.top + localY,
+    inCanvas: localX >= 0 && localX <= rect.width && localY >= 0 && localY <= rect.height,
+  };
+}
+
 function screenPointForEntity(entityId) {
   if (!runtimeDebugEnabled || !state.engine) return { ok: false, reason: 'debug_runtime_unavailable' };
   const command = getRenderScene(state.engine).commands.find((item) => item.id === entityId);
   if (!command) return { ok: false, reason: 'entity_missing' };
-  const rect = canvas.getBoundingClientRect();
   const pointX = command.kind === 'agent_sprite' ? command.x : command.x + (command.w || 1) / 2;
   const pointY = command.kind === 'agent_sprite' ? command.y : command.y + (command.h || 1) / 2;
-  const centerX = pointX * TILE - state.camera.x;
-  const centerY = pointY * TILE - state.camera.y;
   return {
-    ok: true,
-    x: rect.left + centerX,
-    y: rect.top + centerY,
-    inCanvas: centerX >= 0 && centerX <= rect.width && centerY >= 0 && centerY <= rect.height,
+    ...screenPointForWorld(pointX, pointY),
     command: { id: command.id, kind: command.kind, x: command.x, y: command.y, w: command.w, h: command.h },
   };
 }
@@ -2050,7 +2355,8 @@ function getWorldGeometry() {
     worldWidth: width * TILE,
     worldHeight: height * TILE,
     camera: { ...state.camera },
-    canvas: { width: rect.width, height: rect.height },
+    canvas: { width: rect.width, height: rect.height, left: rect.left, top: rect.top },
+    zoom: inputState.worldZoom,
     fullMapMode,
   };
 }
@@ -2058,11 +2364,34 @@ function getWorldGeometry() {
 const runtimeApi = {
   getMode: () => state.mode,
   getPlayer: () => ({ ...state.player }),
+  getInputState: () => ({
+    movementPointerId: inputState.movementPointerId,
+    cameraPointerId: inputState.cameraPointerId,
+    pointerRoles: Object.fromEntries(inputState.pointerRoles),
+    moveVector: { ...inputState.moveVector },
+    cameraFreeLook: { ...inputState.cameraFreeLook },
+    worldZoom: inputState.worldZoom,
+    movementSide: inputState.movementSide,
+    dossierState: state.dossierState,
+    joystickActive: joystickZone.dataset.active === 'true',
+    lastReset: playfield.dataset.inputReset || '',
+  }),
+  resetInput: (reason = 'debug') => resetAllInput(reason),
+  setDossierState: (next) => setDossierState(next),
+  setMovementSide: (next) => setMovementSide(next),
+  clearSelectionForTest: () => {
+    if (!runtimeDebugEnabled || !state.engine) return { ok: false, reason: 'debug_runtime_unavailable' };
+    state.engine.selectedId = null;
+    state.selected = null;
+    updateInspector();
+    return { ok: true };
+  },
   performAction: (action) => performAction(action),
   focusEntity: (entityId) => focusEntity(entityId),
   setPlayerForTest: (tileX, tileY) => setPlayerForTest(tileX, tileY),
   findEmptyPointForTest: () => findEmptyPointForTest(),
   screenPointForEntity: (entityId) => screenPointForEntity(entityId),
+  screenPointForWorld: (tileX, tileY) => screenPointForWorld(tileX, tileY),
   getWorldGeometry: () => getWorldGeometry(),
   getGameHud: () => (state.engine ? getGameHud(state.engine) : null),
   getRenderScene: () => (state.engine ? getRenderScene(state.engine) : null),

@@ -32,6 +32,13 @@ function finiteNumber(value, fallback) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+export function joystickMagnitudeForDistance(distance, deadZone = 12, maxReach = 58) {
+  const safeDeadZone = Math.max(0, finiteNumber(deadZone, 12));
+  const safeMaxReach = Math.max(safeDeadZone + 1, finiteNumber(maxReach, 58));
+  const linear = clamp((finiteNumber(distance, 0) - safeDeadZone) / (safeMaxReach - safeDeadZone), 0, 1);
+  return linear * linear * (3 - 2 * linear);
+}
+
 function placeByIndex(index, width, height) {
   const pair = DEFAULT_POSITIONS[index % DEFAULT_POSITIONS.length];
   return {
@@ -430,13 +437,16 @@ function chooseDefaultSelectedId(world) {
 function createInitialPlayer(world, selectedId) {
   const selected = (selectedId && entityById(world, selectedId)) || world.entities[0] || null;
   const center = selected ? entityCenter(selected) : { x: 8.5, y: 12.5 };
+  const approachY = selected
+    ? (finiteNumber(selected.y, center.y) + Math.max(1, finiteNumber(selected.h, 1)) + 0.75)
+    : center.y;
   const worldW = world.tilemap.width * TILE;
   const worldH = world.tilemap.height * TILE;
   return {
-    x: clamp(center.x * TILE - TILE * 1.15, 16, Math.max(16, worldW - 16)),
-    y: clamp(center.y * TILE + TILE * 0.45, 16, Math.max(16, worldH - 16)),
+    x: clamp(center.x * TILE, 16, Math.max(16, worldW - 16)),
+    y: clamp(approachY * TILE, 16, Math.max(16, worldH - 16)),
     speed: 120,
-    facing: 'down',
+    facing: 'up',
   };
 }
 
@@ -659,6 +669,15 @@ export function createTerrariumEngine(rawWorld, options = {}) {
   return engine;
 }
 
+const PLAYER_COLLISION_RADIUS = 10;
+export const POND_LAYOUT = Object.freeze({ x: 18, y: 11, w: 7, h: 4 });
+const POND_COLLIDER = {
+  x: POND_LAYOUT.x * TILE,
+  y: POND_LAYOUT.y * TILE,
+  w: POND_LAYOUT.w * TILE,
+  h: POND_LAYOUT.h * TILE,
+};
+
 function clampPlayer(engine) {
   const worldW = engine.world.tilemap.width * TILE;
   const worldH = engine.world.tilemap.height * TILE;
@@ -666,14 +685,70 @@ function clampPlayer(engine) {
   engine.player.y = clamp(engine.player.y, 16, Math.max(16, worldH - 16));
 }
 
-function updateCamera(engine) {
+function circleIntersectsRect(x, y, radius, rect) {
+  const nearestX = clamp(x, rect.left, rect.right);
+  const nearestY = clamp(y, rect.top, rect.bottom);
+  const dx = x - nearestX;
+  const dy = y - nearestY;
+  return dx * dx + dy * dy < radius * radius;
+}
+
+function buildingCollisionRects(building) {
+  const left = finiteNumber(building.x, 0) * TILE + 4;
+  const top = finiteNumber(building.y, 0) * TILE + 4;
+  const right = (finiteNumber(building.x, 0) + Math.max(1, finiteNumber(building.w, 1))) * TILE - 4;
+  const bottom = (finiteNumber(building.y, 0) + Math.max(1, finiteNumber(building.h, 1))) * TILE;
+  const center = (left + right) / 2;
+  const doorwayHalf = clamp((right - left) * 0.13, 15, 24);
+  const doorwayTop = bottom - 22;
+  return [
+    { left, top, right, bottom: doorwayTop },
+    { left, top: doorwayTop, right: center - doorwayHalf, bottom },
+    { left: center + doorwayHalf, top: doorwayTop, right, bottom },
+  ].filter((rect) => rect.right > rect.left && rect.bottom > rect.top);
+}
+
+function pondCollisionRects() {
+  const { x, y, w, h } = POND_COLLIDER;
+  return [
+    { left: x, top: y + 10, right: x + w, bottom: y + h - 10 },
+    { left: x + 10, top: y, right: x + w - 10, bottom: y + h },
+  ];
+}
+
+function canPlayerOccupy(engine, x, y) {
+  const worldW = engine.world.tilemap.width * TILE;
+  const worldH = engine.world.tilemap.height * TILE;
+  const radius = PLAYER_COLLISION_RADIUS;
+  if (x - radius < 0 || y - radius < 0 || x + radius > worldW || y + radius > worldH) return false;
+
+  for (const building of engine.world.buildings || []) {
+    if (building.visible_as === 'source_root' || building.kind === 'source_root') continue;
+    if (buildingCollisionRects(building).some((rect) => circleIntersectsRect(x, y, radius, rect))) return false;
+  }
+  if (pondCollisionRects().some((rect) => circleIntersectsRect(x, y, radius, rect))) return false;
+  return true;
+}
+
+function movePlayerWithCollision(engine, dx, dy) {
+  const startX = engine.player.x;
+  const startY = engine.player.y;
+  const nextX = startX + dx;
+  if (canPlayerOccupy(engine, nextX, startY)) engine.player.x = nextX;
+  const nextY = startY + dy;
+  if (canPlayerOccupy(engine, engine.player.x, nextY)) engine.player.y = nextY;
+}
+
+function updateCamera(engine, offset = null) {
   const worldW = engine.world.tilemap.width * TILE;
   const worldH = engine.world.tilemap.height * TILE;
   const width = finiteNumber(engine.viewportSize.width, 960);
   const height = finiteNumber(engine.viewportSize.height, 640);
+  const offsetX = finiteNumber(offset?.x, 0);
+  const offsetY = finiteNumber(offset?.y, 0);
   const smoothing = 0.18;
-  engine.camera.x += (engine.player.x - width / 2 - engine.camera.x) * smoothing;
-  engine.camera.y += (engine.player.y - height / 2 - engine.camera.y) * smoothing;
+  engine.camera.x += (engine.player.x - width / 2 + offsetX - engine.camera.x) * smoothing;
+  engine.camera.y += (engine.player.y - height / 2 + offsetY - engine.camera.y) * smoothing;
   engine.camera.x = clamp(engine.camera.x, 0, Math.max(0, worldW - width));
   engine.camera.y = clamp(engine.camera.y, 0, Math.max(0, worldH - height));
 }
@@ -720,8 +795,8 @@ export function stepTerrariumEngine(engine, input = {}) {
     };
   }
   const keys = keySet(input.keys);
-  let dx = 0;
-  let dy = 0;
+  let dx = finiteNumber(input.moveVector?.x, 0);
+  let dy = finiteNumber(input.moveVector?.y, 0);
   if (keys.has('arrowleft') || keys.has('a') || keys.has('left')) dx -= 1;
   if (keys.has('arrowright') || keys.has('d') || keys.has('right')) dx += 1;
   if (keys.has('arrowup') || keys.has('w') || keys.has('up')) dy -= 1;
@@ -729,15 +804,18 @@ export function stepTerrariumEngine(engine, input = {}) {
 
   const deltaMs = clamp(finiteNumber(input.deltaMs, 1000 / 60), 0, 250);
   engine.tickMs += deltaMs;
-  if (dx || dy) {
-    const len = Math.hypot(dx, dy) || 1;
+  const magnitude = Math.hypot(dx, dy);
+  if (magnitude > 0) {
+    if (magnitude > 1) {
+      dx /= magnitude;
+      dy /= magnitude;
+    }
     const distance = finiteNumber(engine.player.speed, 120) * (deltaMs / 1000);
-    engine.player.x += (dx / len) * distance;
-    engine.player.y += (dy / len) * distance;
+    movePlayerWithCollision(engine, dx * distance, dy * distance);
     engine.player.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
   }
   clampPlayer(engine);
-  updateCamera(engine);
+  updateCamera(engine, input.cameraOffset);
   updateAgentRenderPositions(engine);
   updateNearby(engine);
   refreshQuestLog(engine.world, engine.game);

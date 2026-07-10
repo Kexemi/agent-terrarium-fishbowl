@@ -184,13 +184,13 @@
   "fishbowl": {
     "freshness": {
       "label": "Fresh local snapshot",
-      "latest_at": "2026-07-10T00:57:46.882525+00:00"
+      "latest_at": "2026-07-10T11:48:08.446691+00:00"
     },
     "health": {
       "alerts": [],
-      "label": "Working · 9 service warnings",
+      "label": "Working · 8 service warnings",
       "ok": true,
-      "service_warnings": 9,
+      "service_warnings": 8,
       "tone": "watch"
     },
     "inbox": {
@@ -214,7 +214,7 @@
     "proof": {
       "cbr_r": 0.478,
       "mes_r_status": "INVALID",
-      "token_value": 0.608,
+      "token_value": 0.64,
       "tqs_r_status": "PROXY"
     },
     "queue": {
@@ -224,18 +224,18 @@
       "oldest_queued_at": null,
       "pressure": "IDLE_CLEAR",
       "queued": 0,
-      "receipted": 6718
+      "receipted": 12502
     },
     "schema": "agent_terrarium_fishbowl.v1",
     "truth_boundary": "Local read-only snapshot; no work, gate, spend, send, deploy, or credential mutation from this game slice.",
     "work": {
       "label": "Proof lane: draining + proving",
       "last_tick": {
-        "at": "2026-07-10T00:57:46.651022+00:00",
+        "at": "2026-07-10T11:48:08.181745+00:00",
         "mode": "PARALLEL",
         "steps": 13,
         "steps_ok": 11,
-        "wall_s": 14.216
+        "wall_s": 13.583
       },
       "status": "ARMED_LOCAL_DRAIN_AND_PROVE"
     }
@@ -343,7 +343,7 @@
   },
   "organs": [
     {
-      "body": "The sorting shed holds 390 captured signals until review turns them into safe work.",
+      "body": "The sorting shed holds 419 captured signals until review turns them into safe work.",
       "h": 5,
       "id": "inbox-ingestion-gate",
       "kind": "intake",
@@ -369,10 +369,10 @@
       "next_event": "source_changed",
       "proof": {
         "event_id": "dfe49443e7add4e1",
-        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
+        "sha256": "c207fab76f4ef97f46b548b9dfdfc7a0854b787d77fa9d41fd20caa82f29f331",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
         "status": "source_linked",
-        "timestamp": "2026-07-10T00:52:53Z"
+        "timestamp": "2026-07-10T11:37:52Z"
       },
       "state": "status_visible",
       "title": "Hearth House",
@@ -476,17 +476,17 @@
       "y": 22
     },
     {
-      "body": "Tools at hand are visible without making the owner memorize machinery: enabled=21, paused=6.",
+      "body": "Tools at hand are visible without making the owner memorize machinery: enabled=22, paused=6.",
       "h": 4,
       "id": "capability-map",
       "kind": "capability",
       "next_event": "red_team_review_requested",
       "proof": {
         "event_id": "dfe49443e7add4e1",
-        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
+        "sha256": "cdee423c0c4a6332d26248c52e241bc62dd520922bfe70f486a291c9d14afee5",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
         "status": "source_linked",
-        "timestamp": "2026-07-09T23:24:05Z"
+        "timestamp": "2026-07-10T11:24:06Z"
       },
       "state": "capabilities_visible",
       "title": "Tool Shed",
@@ -502,10 +502,10 @@
       "next_event": "scoreboard_changed",
       "proof": {
         "event_id": "dfe49443e7add4e1",
-        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
+        "sha256": "bed2fced0006789b90df83ec960ecba6d9c11400495871f934826097f9193cca",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
         "status": "source_linked",
-        "timestamp": "2026-07-10T00:57:46Z"
+        "timestamp": "2026-07-10T11:48:08Z"
       },
       "state": "measured_growth_visible",
       "title": "Proof Orchard",
@@ -626,19 +626,19 @@
     "sources": [
       {
         "id": "aios-service-status",
-        "mtime_iso": "2026-07-10T00:52:53Z",
+        "mtime_iso": "2026-07-10T11:37:52Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
         "role": "service_status",
-        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
-        "size_bytes": 10069
+        "sha256": "c207fab76f4ef97f46b548b9dfdfc7a0854b787d77fa9d41fd20caa82f29f331",
+        "size_bytes": 10089
       },
       {
         "id": "capability-map",
-        "mtime_iso": "2026-07-09T23:24:05Z",
+        "mtime_iso": "2026-07-10T11:24:06Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
         "role": "capability_map",
-        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
-        "size_bytes": 3247
+        "sha256": "cdee423c0c4a6332d26248c52e241bc62dd520922bfe70f486a291c9d14afee5",
+        "size_bytes": 3322
       },
       {
         "id": "event-bus",
@@ -666,11 +666,11 @@
       },
       {
         "id": "meta-health",
-        "mtime_iso": "2026-07-10T00:57:46Z",
+        "mtime_iso": "2026-07-10T11:48:08Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\health-latest.json",
         "role": "meta_health",
-        "sha256": "81c021f0390af6f31e185347dc58ca0ed2a847400ac221ec25f2fc0128cae67f",
-        "size_bytes": 153
+        "sha256": "76779923d7920e5e9e8f9af1c64f22c0cc49d56ac156295090d344fb1195cefa",
+        "size_bytes": 122
       },
       {
         "id": "meta-launch",
@@ -682,19 +682,19 @@
       },
       {
         "id": "meta-prime-queue",
-        "mtime_iso": "2026-07-10T00:57:45Z",
+        "mtime_iso": "2026-07-10T11:48:07Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\prime-queue.sqlite",
         "role": "meta_queue",
-        "sha256": "a630a4d5eec1aa435aa2e0882df22d876d3dd9ae7d14b4219b3435f4ca4cd15a",
-        "size_bytes": 1970176
+        "sha256": "cb67787e50a414e4a59f0576e4a422b79430bf802652cb2a4132b1f8f363effc",
+        "size_bytes": 3837952
       },
       {
         "id": "meta-scoreboard",
-        "mtime_iso": "2026-07-10T00:57:46Z",
+        "mtime_iso": "2026-07-10T11:48:08Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
         "role": "meta_scoreboard",
-        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
-        "size_bytes": 5992
+        "sha256": "bed2fced0006789b90df83ec960ecba6d9c11400495871f934826097f9193cca",
+        "size_bytes": 5629
       },
       {
         "id": "owner-guide",
@@ -754,11 +754,11 @@
       },
       {
         "id": "vault-state",
-        "mtime_iso": "2026-07-09T23:24:05Z",
+        "mtime_iso": "2026-07-10T11:24:05Z",
         "path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Vault-State.md",
         "role": "vault_state",
-        "sha256": "ce68a7d260d1ecaec5a7d74375848adf200f3460610ac5d1778d7af505692b7b",
-        "size_bytes": 68405
+        "sha256": "ed855e75037687d94546679c1f24edca3daa5d8e4fc6816489dfd0dee912940f",
+        "size_bytes": 72973
       },
       {
         "id": "workflow-queue",
@@ -875,10 +875,10 @@
         ],
         "next_event": "source_changed",
         "proof_status": "source_root_exists",
-        "sha256": "a78d13eb554e06123f7179e2d62d1f1569e247ffa9ff786c306500baba09be4d",
+        "sha256": "a5bdaab0476df942839ae85b7f818ad892481a600f0c5693cbc762def0af1846",
         "source_path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype",
         "state": "exists",
-        "timestamp": "2026-07-10T00:09:20Z",
+        "timestamp": "2026-07-10T08:24:26Z",
         "title": "repo_root",
         "visible_as": "source_root",
         "x": 16,
@@ -931,7 +931,7 @@
         "y": 19
       },
       {
-        "body": "The sorting shed holds 390 captured signals until review turns them into safe work.",
+        "body": "The sorting shed holds 419 captured signals until review turns them into safe work.",
         "entity_id": "inbox-ingestion-gate",
         "h": 5,
         "hash_scope": "source_content_sha256",
@@ -972,10 +972,10 @@
         ],
         "next_event": "source_changed",
         "proof_status": "source_linked",
-        "sha256": "56aea131b4dd6bf739e677ad924ef4106900c784f5b6349ef585ec491fad2268",
+        "sha256": "c207fab76f4ef97f46b548b9dfdfc7a0854b787d77fa9d41fd20caa82f29f331",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AIOS-Service-Status\\latest.json",
         "state": "status_visible",
-        "timestamp": "2026-07-10T00:52:53Z",
+        "timestamp": "2026-07-10T11:37:52Z",
         "title": "Hearth House",
         "visible_as": "building",
         "w": 6,
@@ -1113,7 +1113,7 @@
         "y": 22
       },
       {
-        "body": "Tools at hand are visible without making the owner memorize machinery: enabled=21, paused=6.",
+        "body": "Tools at hand are visible without making the owner memorize machinery: enabled=22, paused=6.",
         "entity_id": "capability-map",
         "h": 4,
         "hash_scope": "source_content_sha256",
@@ -1128,10 +1128,10 @@
         ],
         "next_event": "red_team_review_requested",
         "proof_status": "source_linked",
-        "sha256": "e683abc10ea59168c5d5fcd71f0b605ce6e4513cc7c95d7d473c5a85e2f8d47f",
+        "sha256": "cdee423c0c4a6332d26248c52e241bc62dd520922bfe70f486a291c9d14afee5",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Capability-Map.md",
         "state": "capabilities_visible",
-        "timestamp": "2026-07-09T23:24:05Z",
+        "timestamp": "2026-07-10T11:24:06Z",
         "title": "Tool Shed",
         "visible_as": "building",
         "w": 6,
@@ -1154,10 +1154,10 @@
         ],
         "next_event": "scoreboard_changed",
         "proof_status": "source_linked",
-        "sha256": "012881b3c440eccecb04af214f153fb0209b9c07943999c249a3c8128773f283",
+        "sha256": "bed2fced0006789b90df83ec960ecba6d9c11400495871f934826097f9193cca",
         "source_path": "[LOCAL_AI_OS]/Obsidian Vault\\System\\Automation\\Logs\\AI-OS-Meta-Recenter\\stage\\scoreboard-latest.json",
         "state": "measured_growth_visible",
-        "timestamp": "2026-07-10T00:57:46Z",
+        "timestamp": "2026-07-10T11:48:08Z",
         "title": "Proof Orchard",
         "visible_as": "building",
         "w": 5,
@@ -1773,8 +1773,8 @@
         "id": "repo",
         "path": "[LOCAL_AI_OS]/Repos\\Agent-Terrarium-Prototype",
         "role": "repo_root",
-        "sha256": "a78d13eb554e06123f7179e2d62d1f1569e247ffa9ff786c306500baba09be4d",
-        "timestamp": "2026-07-10T00:09:20Z"
+        "sha256": "a5bdaab0476df942839ae85b7f818ad892481a600f0c5693cbc762def0af1846",
+        "timestamp": "2026-07-10T08:24:26Z"
       },
       {
         "exists": true,
