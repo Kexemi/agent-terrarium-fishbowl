@@ -1,21 +1,29 @@
 {
   "absolute_local_path_hits": 0,
+  "build_id": "35e2adecbd19",
   "debug_runtime_localhost_only": true,
   "debug_runtime_public_default": false,
   "debug_runtime_public_query_override": false,
-  "file_count": 9,
+  "file_count": 14,
   "files": {
-    "PUBLIC-BOUNDARY.md": "985cf653dafc201ef71c2d959ae4386abd0ec7866749da80ea893aa50a270c10",
-    "index.html": "5c0191600519774dde7fb71dcc420b7339fa3312c4cd196d163fe3eb0f2718cb",
+    "PUBLIC-BOUNDARY.md": "d9c1623386390efd93c487f5be5e0e7c5311f437d6ace2610417b73c16339329",
+    "index.html": "03774e0c1ec6c1bc7ca0599286ea14df85a775f82ff14c465ed41de0cb0e4bb7",
+    "public/app-version.json": "0d50d019e8f80011261aea1966d21c186214a6fe9f21222cc2e4b9a99d777f82",
+    "public/icons/terrarium-180.png": "4d6787572328846949d50426e28cc6650224b79a1dfe716d63f555eced89ea34",
+    "public/icons/terrarium-192.png": "29fd9d346b93cf577fe4d7f7e973b4bcf4ea3b1bd3353a621878fccf05075b9b",
+    "public/icons/terrarium-512.png": "4469db01ada48b6682994011ed39b682c8ee2a5cd40d990d878fe29cca5833f1",
+    "public/manifest.webmanifest": "11b87a3fce1711210067017330f92176ef9844f27406ea16a85c0b41c1b9af69",
     "public/owner_guide.json": "65cc1dc747132d384daea791a2705c43388b44d38607ec3dd5a263250fca7114",
     "public/world.fixture.json": "ddd54e09d5eebf42fd3dc60f274dd2a036cafddf913cbfdf9fc070f92d25e750",
     "public/world.json": "18e2be40588d1c3b6cac637f89d035c66a566eafddb1457129e60a634399916f",
     "src/terrarium-building-art.js": "3b2d3cbe90edc72345bf854aed496acabfa23172ea9fa8a9f1e55f644d7db3ba",
     "src/terrarium-engine.js": "07bcbf57e1766633403bfc4a3efc0a6bf2618c95ee9a12bb97269ce593d34d40",
-    "src/terrarium-runtime.js": "9c75ceb04c4086473d01fdb31f25c7ee06ca644be9a35d5d1443fadaff196504",
+    "src/terrarium-runtime.js": "c167e97e2b29b5cb475cca622d9c02e233f4bf935997151e84df70ca4567448f",
     "src/terrarium-style.css": "dbfa4c4924db80cea95bf1ab5f011a764320c64494e32ce868e7309ad2e49e54"
   },
   "read_only": true,
   "schema": "agent_terrarium_public_safe.v1",
-  "secret_hits": 0
+  "secret_hits": 0,
+  "service_worker": false,
+  "update_mode": "foreground_network_check"
 }

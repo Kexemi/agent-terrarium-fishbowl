@@ -13,12 +13,12 @@ import {
   snapshotEngine,
   applyWorldSnapshot,
   joystickMagnitudeForDistance,
-} from './terrarium-engine.js';
+} from './terrarium-engine.js?v=35e2adecbd19';
 import {
   getBuildingArtProfile,
   getBuildingDisplayLabel,
   getBuildingVisualState,
-} from './terrarium-building-art.js';
+} from './terrarium-building-art.js?v=35e2adecbd19';
 
 const canvas = document.getElementById('gameCanvas');
 const playfield = document.getElementById('playfield');
@@ -90,6 +90,36 @@ if (fullMapMode) document.documentElement.dataset.fullMap = 'true';
 const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
 const runtimeDebugEnabled = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
 const visualViewport = window.visualViewport;
+const appBuildId = document.querySelector('meta[name="agent-terrarium-build"]')?.content || 'source';
+const isStandaloneApp = Boolean(window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true);
+document.documentElement.dataset.installMode = isStandaloneApp ? 'standalone' : 'browser';
+document.documentElement.dataset.appBuild = appBuildId;
+let appUpdateCheck = null;
+
+async function checkForAppUpdate() {
+  if (appUpdateCheck || !['http:', 'https:'].includes(window.location.protocol)) return appUpdateCheck;
+  appUpdateCheck = (async () => {
+    try {
+      const response = await fetch(`public/app-version.json?check=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) return { ok: false, reason: `version_http_${response.status}` };
+      const latest = await response.json();
+      const nextBuild = String(latest?.version || '').trim();
+      if (!nextBuild || nextBuild === appBuildId || nextBuild === '35e2adecbd19') {
+        return { ok: true, changed: false, build: appBuildId };
+      }
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('app-build') === nextBuild) return { ok: false, reason: 'reload_guard', build: nextBuild };
+      url.searchParams.set('app-build', nextBuild);
+      window.location.replace(url.toString());
+      return { ok: true, changed: true, build: nextBuild };
+    } catch (error) {
+      return { ok: false, reason: 'version_check_failed', error: String(error?.message || error) };
+    } finally {
+      appUpdateCheck = null;
+    }
+  })();
+  return appUpdateCheck;
+}
 
 function syncVisualViewportHeight() {
   const measured = visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 665;
@@ -2492,12 +2522,14 @@ playfield.addEventListener('contextmenu', (event) => event.preventDefault());
 playfield.addEventListener('dragstart', (event) => event.preventDefault());
 window.addEventListener('blur', () => resetAllInput('blur'));
 window.addEventListener('pagehide', () => resetAllInput('pagehide'));
+window.addEventListener('pageshow', () => { checkForAppUpdate(); });
 window.addEventListener('orientationchange', () => {
   resetAllInput('orientationchange');
   window.requestAnimationFrame(syncVisualViewportHeight);
 });
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') resetAllInput('visibilitychange');
+  if (document.visibilityState === 'visible') checkForAppUpdate();
 });
 
 function showActionToast(result) {
@@ -2694,6 +2726,8 @@ function getWorldGeometry() {
 
 const runtimeApi = {
   getMode: () => state.mode,
+  getAppInstallState: () => ({ buildId: appBuildId, standalone: isStandaloneApp, installMode: document.documentElement.dataset.installMode }),
+  checkForAppUpdate: () => checkForAppUpdate(),
   getPlayer: () => ({ ...state.player }),
   getInputState: () => ({
     movementPointerId: inputState.movementPointerId,
